@@ -68,14 +68,32 @@ namespace voyager::math
 
 		/**
 		 * .
+		 *
+		 * \param start
+		 * \param end
+		 * \param t
+		 * \return
 		 */
 		friend vec3 lerp(const vec3& start, const vec3& end, float t);
 
 		/**
 		 * .
+		 *
+		 * \param start
+		 * \param end
+		 * \param t
+		 * \return
 		 */
 		friend vec3 slerp(const vec3& start, const vec3& end, float t);
 
+		/**
+		 * .
+		 *
+		 * \param start
+		 * \param end
+		 * \param t
+		 * \return
+		 */
 		friend vec3 nlerp(const vec3& start, const vec3& end, float t);
 	};
 }

@@ -14,8 +14,8 @@ project "ramanujan"
   language  "C++"
   characterset ("MBCS")
 
-  targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-  objdir ("../bin-intermediate/" .. outputdir .. "/%{prj.name}")
+  targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+  objdir ("bin-intermediate/" .. outputdir .. "/%{prj.name}")
 
   files
   {
