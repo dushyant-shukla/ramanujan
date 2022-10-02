@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-namespace ramanujan::math
+namespace ramanujan
 {
 vec3 operator+(const vec3& a, const vec3& b)
 {
@@ -303,4 +303,4 @@ bool vec3::operator!=(const vec3& other)
 {
     return !(*this == other);
 }
-} // namespace ramanujan::math
+} // namespace ramanujan

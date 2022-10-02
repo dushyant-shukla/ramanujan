@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ramanujan::math
+namespace ramanujan
 {
 template <typename T>
 struct TVec2
@@ -22,4 +22,4 @@ struct TVec2
 
 typedef TVec2<float> vec2;
 typedef TVec2<int>   ivec2;
-} // namespace ramanujan::math
+} // namespace ramanujan

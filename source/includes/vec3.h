@@ -2,7 +2,7 @@
 
 #include "constants.h"
 
-namespace ramanujan::math
+namespace ramanujan
 {
 /**
  * A 3D vector construct.
@@ -96,4 +96,4 @@ struct vec3
      */
     friend vec3 nlerp(const vec3& start, const vec3& end, float t);
 };
-} // namespace ramanujan::math
+} // namespace ramanujan
