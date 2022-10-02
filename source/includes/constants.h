@@ -1,6 +1,6 @@
 #pragma once
 
-namespace voyager::math
+namespace ramanujan::math
 {
 /*!
  * Library wide constants are defined here
@@ -13,4 +13,4 @@ struct constants
 
     inline static const float DEG_TO_RAD = 0.0174533f;
 };
-} // namespace voyager::math
+} // namespace ramanujan::math
