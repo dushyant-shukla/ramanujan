@@ -28,10 +28,9 @@ struct vec3
     bool operator==(const vec3& other);
     bool operator!=(const vec3& other);
 
-    /**
-     * Operators are defined as friend functions as we would like to keep the state of vectors unaffected
-     * by the operations.
-     */
+    // Operators are defined as friend functions as we would like to keep the state of vectors unaffected by the
+    // operations.
+
     friend vec3  operator+(const vec3& a, const vec3& b);
     friend vec3  operator-(const vec3& a, const vec3& b);
     friend vec3  operator*(const vec3& a, float scaling_factor);
@@ -67,32 +66,51 @@ struct vec3
     friend vec3 cross(const vec3& a, const vec3& b);
 
     /**
-     * .
+     * Linear interpolation can be calculated by scaling the difference between the two vectors,
+     * and adding the result back to the original vector.
      *
-     * \param start
-     * \param end
-     * \param t
-     * \return
+     * The amount to lerp by is a normalized value (t) between 0 and 1. When t = 0, the interpolated
+     * vector is the same as the starting vector. When t = 1, the interpolated vector is the same as
+     * the end vector.
+     *
+     * Linearly interpolating between two vectors will always take the shortest path from one vector
+     * to another.
+     *
+     * \param start The start vector
+     * \param end The end vector
+     * \param t The amount to lerp by
+     * \return A linearly interpolated vector
      */
     friend vec3 lerp(const vec3& start, const vec3& end, float t);
 
     /**
-     * .
+     * Sometimes, the shortest path obtained between by linearly interpolating between two vectors
+     * isn't the best path. Sometimes, we may want to interpolate between two vectors along the
+     * shortest arc, i.e., Spherical Linear Interpolation (slerp).
+     *
+     * Assuming, theta is the angle between the two vectors, the formula for slerp is given by:
+     *
+     * slerp(start, end, t) = [sin((1-t)theta) / sin(theta) * start] + [sin((t)theta) / sin(theta) * end]
      *
      * \param start
      * \param end
      * \param t
-     * \return
+     * \return A normalized linearly interpolated vector
      */
     friend vec3 slerp(const vec3& start, const vec3& end, float t);
 
     /**
-     * .
+     * Normalized linear interpolation closely approximates spherical linear interpolation,
+     * and is cheaper to calculate. Because of these reasons nlerp is much faster, and
+     * generally, the better choice than slerp.
+     *
+     * Unlike slerp, nlerp is not constant in velocity. Therefore, use slerp if constant
+     * interpolation velocity is required.
      *
      * \param start
      * \param end
      * \param t
-     * \return
+     * \return A normalized linearly interpolated vector
      */
     friend vec3 nlerp(const vec3& start, const vec3& end, float t);
 };
