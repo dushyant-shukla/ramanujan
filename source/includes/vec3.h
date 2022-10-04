@@ -7,7 +7,7 @@ namespace ramanujan
 /**
  * A 3D vector construct.
  */
-struct vec3
+struct Vec3
 {
     union
     {
@@ -20,50 +20,50 @@ struct vec3
         float v[3];
     };
 
-    inline vec3() : x(0.0f), y(0.0f), z(0.0f) {}
-    inline vec3(const float& _x, const float& _y, const float& _z) : x(_x), y(_y), z(_z) {}
-    inline vec3(float* fv) : x(fv[0]), y(fv[1]), z(fv[3]) {}
+    inline Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
+    inline Vec3(const float& _x, const float& _y, const float& _z) : x(_x), y(_y), z(_z) {}
+    inline Vec3(float* fv) : x(fv[0]), y(fv[1]), z(fv[3]) {}
 
     void normalize();
-    bool operator==(const vec3& other);
-    bool operator!=(const vec3& other);
+    bool operator==(const Vec3& other);
+    bool operator!=(const Vec3& other);
 
     // Operators are defined as friend functions as we would like to keep the state of vectors unaffected by the
     // operations.
 
-    friend vec3  operator+(const vec3& a, const vec3& b);
-    friend vec3  operator-(const vec3& a, const vec3& b);
-    friend vec3  operator*(const vec3& a, float scaling_factor);
-    friend vec3  operator*(float scaling_factor, const vec3& a);
-    friend vec3  operator*(const vec3& a, const vec3& b);
-    friend float dot(const vec3& a, const vec3& b);
-    friend float lengthSq(const vec3& a);
-    friend float length(const vec3& a);
-    friend float distance(const vec3& a, const vec3& b);
-    friend vec3  normalized(const vec3 a);
+    friend Vec3  operator+(const Vec3& a, const Vec3& b);
+    friend Vec3  operator-(const Vec3& a, const Vec3& b);
+    friend Vec3  operator*(const Vec3& a, float scaling_factor);
+    friend Vec3  operator*(float scaling_factor, const Vec3& a);
+    friend Vec3  operator*(const Vec3& a, const Vec3& b);
+    friend float dot(const Vec3& a, const Vec3& b);
+    friend float lengthSq(const Vec3& a);
+    friend float length(const Vec3& a);
+    friend float distance(const Vec3& a, const Vec3& b);
+    friend Vec3  normalized(const Vec3 a);
 
     /**
      * This method returns projection of vector A onto vector B.
      */
-    friend vec3 projection(const vec3& a, const vec3& b);
+    friend Vec3 projection(const Vec3& a, const Vec3& b);
 
     /**
      * This method returns rejection of vector A onto vector B.
      */
-    friend vec3 rejection(const vec3& a, const vec3& b);
+    friend Vec3 rejection(const Vec3& a, const Vec3& b);
 
     /**
      * This function calculates the angle between two vectors in radians.
      */
-    friend float angle(const vec3& a, const vec3& b);
+    friend float angle(const Vec3& a, const Vec3& b);
 
     /**
      * This method returns reflection of vector A on a surface with
      * surface normal given by vector B.
      */
-    friend vec3 reflection(const vec3& a, const vec3& b);
+    friend Vec3 reflection(const Vec3& a, const Vec3& b);
 
-    friend vec3 cross(const vec3& a, const vec3& b);
+    friend Vec3 cross(const Vec3& a, const Vec3& b);
 
     /**
      * Linear interpolation can be calculated by scaling the difference between the two vectors,
@@ -81,7 +81,7 @@ struct vec3
      * \param t The amount to lerp by
      * \return A linearly interpolated vector
      */
-    friend vec3 lerp(const vec3& start, const vec3& end, float t);
+    friend Vec3 lerp(const Vec3& start, const Vec3& end, float t);
 
     /**
      * Sometimes, the shortest path obtained between by linearly interpolating between two vectors
@@ -97,7 +97,7 @@ struct vec3
      * \param t
      * \return A normalized linearly interpolated vector
      */
-    friend vec3 slerp(const vec3& start, const vec3& end, float t);
+    friend Vec3 slerp(const Vec3& start, const Vec3& end, float t);
 
     /**
      * Normalized linear interpolation closely approximates spherical linear interpolation,
@@ -112,6 +112,6 @@ struct vec3
      * \param t
      * \return A normalized linearly interpolated vector
      */
-    friend vec3 nlerp(const vec3& start, const vec3& end, float t);
+    friend Vec3 nlerp(const Vec3& start, const Vec3& end, float t);
 };
 } // namespace ramanujan
