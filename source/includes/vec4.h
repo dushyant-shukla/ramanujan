@@ -22,7 +22,7 @@ struct TVec4
     inline TVec4(T* fv) : x(fv[0]), y(fv[1]), z(fv[2]), w(fv[3]) {}
 };
 
-typedef TVec4<float>        vec4;
-typedef TVec4<int>          ivec4;
-typedef TVec4<unsigned int> uivec4;
+typedef TVec4<float>        Vec4;
+typedef TVec4<int>          IVec4;
+typedef TVec4<unsigned int> UIVec4;
 } // namespace ramanujan

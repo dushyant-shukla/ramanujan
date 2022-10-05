@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vec3.h"
 #include "vec4.h"
 
 namespace ramanujan
@@ -14,6 +15,11 @@ struct Mat4
     friend Mat4 operator+(const Mat4& a, const Mat4& b);
     friend Mat4 operator*(const Mat4& a, float f);
     friend Mat4 operator*(const Mat4& a, const Mat4& b);
+    friend Vec4 operator*(const Mat4& m, const Vec4&);
+
+    Vec3 TransformVector(const Mat4& m, const Vec3& v);
+    Vec3 TransformPoint(const Mat4& m, const Vec3& v);
+    Vec3 TransformPoint(const Mat4& m, const Vec3& v, float& w);
 
     union
     {
@@ -22,10 +28,10 @@ struct Mat4
         // for access to elements based on basis vectors
         struct
         {
-            vec4 right;
-            vec4 up;
-            vec4 forward;
-            vec4 position;
+            Vec4 right;
+            Vec4 up;
+            Vec4 forward;
+            Vec4 position;
         };
 
         // for access to elements based on named pairs[basis vector(right, up, forward, position), component(x, y, z,
@@ -117,19 +123,19 @@ struct Mat4
     }; // union
 
     inline Mat4()
-        : xx(1)
+        : xx(1) // col#1
         , xy(0)
         , xz(0)
         , xw(0)
-        , yx(0)
+        , yx(0) // col#2
         , yy(1)
         , yz(0)
         , yw(0)
-        , zx(0)
+        , zx(0) // col#3
         , zy(0)
         , zz(1)
         , zw(0)
-        , tx(0)
+        , tx(0) // col#4
         , ty(0)
         , tz(0)
         , tw(1)
@@ -137,38 +143,38 @@ struct Mat4
     }
 
     inline Mat4(float* fv)
-        : xx(fv[0])
+        : xx(fv[0]) // col#1
         , xy(fv[1])
         , xz(fv[2])
         , xw(fv[3])
-        , yx(fv[4])
+        , yx(fv[4]) // col#2
         , yy(fv[5])
         , yz(fv[6])
         , yw(fv[7])
-        , zx(fv[8])
+        , zx(fv[8]) // col#3
         , zy(fv[9])
         , zz(fv[10])
         , zw(fv[11])
-        , tx(fv[12])
+        , tx(fv[12]) // col#4
         , ty(fv[13])
         , tz(fv[14])
         , tw(fv[15])
     {
     }
 
-    inline Mat4(float _00,
+    inline Mat4(float _00, // col#1
                 float _01,
                 float _02,
                 float _03,
-                float _10,
+                float _10, // col#2
                 float _11,
                 float _12,
                 float _13,
-                float _20,
+                float _20, // col#3
                 float _21,
                 float _22,
                 float _23,
-                float _30,
+                float _30, // col#4
                 float _31,
                 float _32,
                 float _33)
