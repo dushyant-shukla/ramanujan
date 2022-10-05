@@ -25,7 +25,7 @@ files
 
 includedirs
 {
-  "source/includes"
+  "source"
 }
 
 filter { "files:**.c" }
@@ -37,13 +37,11 @@ cppdialect "C++17"
 systemversion "latest"
 
 filter "configurations:Debug"
-buildoptions "/MDd"
 symbols "On"
 staticruntime "off"
 runtime "Debug"
 
 filter "configurations:Release"
-buildoptions "/MD"
 optimize "On"
 staticruntime "off"
 runtime "Release"
