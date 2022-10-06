@@ -97,6 +97,7 @@ Mat4 operator*(const Mat4& a, const Mat4& b)
 // is 0). When a matrix transforms a point, it just translates the point in space (w component of a point is 1).
 #define M4_V4_DOT(m_row, x, y, z, w) \
     m.v[0 * 4 + m_row] * x + m.v[1 * 4 + m_row] * y + m.v[2 * 4 + m_row] * z + m.v[3 * 4 + m_row] * w
+
 Vec4 operator*(const Mat4& m, const Vec4& v)
 {
     return Vec4(M4_V4_DOT(0, v.x, v.y, v.z, v.w),
