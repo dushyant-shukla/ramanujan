@@ -12,14 +12,16 @@ struct Mat4
     bool operator==(const Mat4& other);
     bool operator!=(const Mat4& other);
 
+    void Transpose(Mat4& m);
+    Mat4 Transposed(const Mat4& m);
+    Vec3 TransformVector(const Mat4& m, const Vec3& v);
+    Vec3 TransformPoint(const Mat4& m, const Vec3& v);
+    Vec3 TransformPoint(const Mat4& m, const Vec3& v, float& w);
+
     friend Mat4 operator+(const Mat4& a, const Mat4& b);
     friend Mat4 operator*(const Mat4& a, float f);
     friend Mat4 operator*(const Mat4& a, const Mat4& b);
     friend Vec4 operator*(const Mat4& m, const Vec4&);
-
-    Vec3 TransformVector(const Mat4& m, const Vec3& v);
-    Vec3 TransformPoint(const Mat4& m, const Vec3& v);
-    Vec3 TransformPoint(const Mat4& m, const Vec3& v, float& w);
 
     union
     {

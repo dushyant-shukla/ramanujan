@@ -63,6 +63,40 @@ Mat4 operator*(const Mat4& a, float f)
                 a.tw * f);
 }
 
+#define M4_SWAP(x, y) \
+    {                 \
+        float t = x;  \
+        x       = y;  \
+        y       = t;  \
+    }
+
+/**
+ * Transposing a matrix is useful if you need to convert a matrix from row-major to column-major or vice versa.
+ * 
+ * \param m Matrix to be transposed
+ */
+void Mat4::Transpose(Mat4& m)
+{
+    M4_SWAP(m.yx, m.xy);
+    M4_SWAP(m.zx, m.xz);
+    M4_SWAP(m.tx, m.xw);
+    M4_SWAP(m.zy, m.yz);
+    M4_SWAP(m.ty, m.yw);
+    M4_SWAP(m.tz, m.zw);
+}
+
+/**
+ * Transposing a matrix is useful if you need to convert a matrix from row-major to column-major or vice versa.
+ * 
+ * \param m Matrix to be transposed
+ * \return Transposed matrix
+ */
+Mat4 Mat4::Transposed(const Mat4& m)
+{
+    // Transpose is converting a column-major matrix to a row-major matrix here
+    return Mat4(m.xx, m.yx, m.zx, m.tx, m.xy, m.yy, m.zy, m.ty, m.xz, m.yz, m.zz, m.tz, m.xw, m.yw, m.zw, m.tw);
+}
+
 // In column-major matrix, c[r, c] = c * R + r
 // Each element in the matrix multiplication can be described as the dot product between the corresponding row of the
 // first matrix, and the corresponding column of the second matrix. In  short, M[i, j] = Ri(A) dot Ci(B)
