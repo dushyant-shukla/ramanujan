@@ -1,28 +1,13 @@
 #pragma once
 
-#include "vec3.h"
-#include "vec4.h"
+#include "vector3.h"
+#include "vector4.h"
 
 namespace ramanujan
 {
 
-struct Mat4
+struct Matrix4
 {
-
-    bool operator==(const Mat4& other);
-    bool operator!=(const Mat4& other);
-
-    void Transpose(Mat4& m);
-    Mat4 Transposed(const Mat4& m);
-    Vec3 TransformVector(const Mat4& m, const Vec3& v);
-    Vec3 TransformPoint(const Mat4& m, const Vec3& v);
-    Vec3 TransformPoint(const Mat4& m, const Vec3& v, float& w);
-
-    friend Mat4 operator+(const Mat4& a, const Mat4& b);
-    friend Mat4 operator*(const Mat4& a, float f);
-    friend Mat4 operator*(const Mat4& a, const Mat4& b);
-    friend Vec4 operator*(const Mat4& m, const Vec4&);
-
     union
     {
         float v[16];
@@ -30,10 +15,10 @@ struct Mat4
         // for access to elements based on basis vectors
         struct
         {
-            Vec4 right;
-            Vec4 up;
-            Vec4 forward;
-            Vec4 position;
+            Vector4 right;
+            Vector4 up;
+            Vector4 forward;
+            Vector4 position;
         };
 
         // for access to elements based on named pairs[basis vector(right, up, forward, position), component(x, y, z,
@@ -124,7 +109,7 @@ struct Mat4
         };
     }; // union
 
-    inline Mat4()
+    inline Matrix4()
         : xx(1) // col#1
         , xy(0)
         , xz(0)
@@ -144,7 +129,7 @@ struct Mat4
     {
     }
 
-    inline Mat4(float* fv)
+    inline Matrix4(float* fv)
         : xx(fv[0]) // col#1
         , xy(fv[1])
         , xz(fv[2])
@@ -164,22 +149,22 @@ struct Mat4
     {
     }
 
-    inline Mat4(float _00, // col#1
-                float _01,
-                float _02,
-                float _03,
-                float _10, // col#2
-                float _11,
-                float _12,
-                float _13,
-                float _20, // col#3
-                float _21,
-                float _22,
-                float _23,
-                float _30, // col#4
-                float _31,
-                float _32,
-                float _33)
+    inline Matrix4(float _00, // col#1
+                   float _01,
+                   float _02,
+                   float _03,
+                   float _10, // col#2
+                   float _11,
+                   float _12,
+                   float _13,
+                   float _20, // col#3
+                   float _21,
+                   float _22,
+                   float _23,
+                   float _30, // col#4
+                   float _31,
+                   float _32,
+                   float _33)
         : xx(_00)
         , xy(_01)
         , xz(_02)
@@ -199,6 +184,19 @@ struct Mat4
     {
     }
 
+    bool operator==(const Matrix4& other);
+    bool operator!=(const Matrix4& other);
+
+    void    Transpose(Matrix4& m);
+    Matrix4 Transposed(const Matrix4& m);
+    Vector3 TransformVector(const Matrix4& m, const Vector3& v);
+    Vector3 TransformPoint(const Matrix4& m, const Vector3& v);
+    Vector3 TransformPoint(const Matrix4& m, const Vector3& v, float& w);
+
+    friend Matrix4 operator+(const Matrix4& a, const Matrix4& b);
+    friend Matrix4 operator*(const Matrix4& a, float f);
+    friend Matrix4 operator*(const Matrix4& a, const Matrix4& b);
+    friend Vector4 operator*(const Matrix4& m, const Vector4&);
 }; // struct Mat4
 
 } // namespace ramanujan

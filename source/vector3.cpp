@@ -1,30 +1,30 @@
-#include "vec3.h"
+#include "vector3.h"
 
 #include <math.h>
 
 namespace ramanujan
 {
-Vec3 operator+(const Vec3& a, const Vec3& b)
+Vector3 operator+(const Vector3& a, const Vector3& b)
 {
-    Vec3 result(a.x + b.x, a.y + b.y, a.z + b.z);
+    Vector3 result(a.x + b.x, a.y + b.y, a.z + b.z);
     return result;
 }
 
-Vec3 operator-(const Vec3& a, const Vec3& b)
+Vector3 operator-(const Vector3& a, const Vector3& b)
 {
-    Vec3 result(a.x - b.x, a.y - b.y, a.z - b.z);
+    Vector3 result(a.x - b.x, a.y - b.y, a.z - b.z);
     return result;
 }
 
-Vec3 operator*(const Vec3& a, float scaling_factor)
+Vector3 operator*(const Vector3& a, float scaling_factor)
 {
-    Vec3 result(a.x * scaling_factor, a.y * scaling_factor, a.z * scaling_factor);
+    Vector3 result(a.x * scaling_factor, a.y * scaling_factor, a.z * scaling_factor);
     return result;
 }
 
-Vec3 operator*(float scaling_factor, const Vec3& a)
+Vector3 operator*(float scaling_factor, const Vector3& a)
 {
-    Vec3 result(a.x * scaling_factor, a.y * scaling_factor, a.z * scaling_factor);
+    Vector3 result(a.x * scaling_factor, a.y * scaling_factor, a.z * scaling_factor);
     return result;
 }
 
@@ -35,9 +35,9 @@ Vec3 operator*(float scaling_factor, const Vec3& a)
  * \param b
  * \return
  */
-Vec3 operator*(const Vec3& a, const Vec3& b)
+Vector3 operator*(const Vector3& a, const Vector3& b)
 {
-    return Vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+    return Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
 /**
@@ -47,7 +47,7 @@ Vec3 operator*(const Vec3& a, const Vec3& b)
  * \param b
  * \return
  */
-float dot(const Vec3& a, const Vec3& b)
+float dot(const Vector3& a, const Vector3& b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -58,7 +58,7 @@ float dot(const Vec3& a, const Vec3& b)
  * \param a
  * \return
  */
-float lengthSq(const Vec3& a)
+float lengthSq(const Vector3& a)
 {
     return a.x * a.x + a.y * a.y + a.z * a.z;
 }
@@ -69,7 +69,7 @@ float lengthSq(const Vec3& a)
  * \param a
  * \return
  */
-float length(const Vec3& a)
+float length(const Vector3& a)
 {
     float length_sq = a.x * a.x + a.y * a.y + a.z * a.z;
     if(length_sq < constants::EPSILON)
@@ -86,7 +86,7 @@ float length(const Vec3& a)
  * \param b
  * \return
  */
-float distance(const Vec3& a, const Vec3& b)
+float distance(const Vector3& a, const Vector3& b)
 {
     return length(a - b);
 }
@@ -97,7 +97,7 @@ float distance(const Vec3& a, const Vec3& b)
  * \param a
  * \return
  */
-Vec3 normalized(const Vec3 a)
+Vector3 normalized(const Vector3 a)
 {
     float length_sq = a.x * a.x + a.y * a.y + a.z * a.z;
     if(length_sq < constants::EPSILON)
@@ -105,7 +105,7 @@ Vec3 normalized(const Vec3 a)
         return a;
     }
     float inverted_length = 1.0f / sqrtf(length_sq);
-    return Vec3(a.x * inverted_length, a.y * inverted_length, a.z * inverted_length);
+    return Vector3(a.x * inverted_length, a.y * inverted_length, a.z * inverted_length);
 }
 
 /**
@@ -117,12 +117,12 @@ Vec3 normalized(const Vec3 a)
  * \param v The vector being projected onto.
  * \return The projection of current vector (*this) onto vector v.
  */
-Vec3 projection(const Vec3& a, const Vec3& b)
+Vector3 projection(const Vector3& a, const Vector3& b)
 {
     float mag_b_sq = lengthSq(b);
     if(mag_b_sq < constants::EPSILON)
     {
-        return Vec3();
+        return Vector3();
     }
 
     /*
@@ -143,12 +143,12 @@ Vec3 projection(const Vec3& a, const Vec3& b)
 /**
  * Rejection of vector A onto vector B is the opposite of projection of vector A onto vector B.
  */
-Vec3 rejection(const Vec3& a, const Vec3& b)
+Vector3 rejection(const Vector3& a, const Vector3& b)
 {
     /*
      * To find rejection of A onto B, subtract the projection of A onto B from vector A.
      */
-    Vec3 proj_a_on_b = projection(a, b);
+    Vector3 proj_a_on_b = projection(a, b);
     return a - proj_a_on_b;
 }
 
@@ -159,7 +159,7 @@ Vec3 rejection(const Vec3& a, const Vec3& b)
  * \param b
  * \return
  */
-float angle(const Vec3& a, const Vec3& b)
+float angle(const Vector3& a, const Vector3& b)
 {
     float sq_mag_v1 = a.x * a.x + a.y * a.y + a.z * a.z;
     float sq_mag_v2 = b.x * b.x + b.y * b.y + b.z * b.z;
@@ -181,9 +181,9 @@ float angle(const Vec3& a, const Vec3& b)
  * \param b
  * \return
  */
-Vec3 reflection(const Vec3& a, const Vec3& b)
+Vector3 reflection(const Vector3& a, const Vector3& b)
 {
-    Vec3 proj_a_on_b = projection(a, b);
+    Vector3 proj_a_on_b = projection(a, b);
     return a - (2 * proj_a_on_b);
 }
 
@@ -194,9 +194,9 @@ Vec3 reflection(const Vec3& a, const Vec3& b)
  * \param b
  * \return
  */
-Vec3 cross(const Vec3& a, const Vec3& b)
+Vector3 cross(const Vector3& a, const Vector3& b)
 {
-    return Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 
 /**
@@ -215,9 +215,9 @@ Vec3 cross(const Vec3& a, const Vec3& b)
  * \param t The amount to lerp by
  * \return A linearly interpolated vector
  */
-Vec3 lerp(const Vec3& start, const Vec3& end, float t)
+Vector3 lerp(const Vector3& start, const Vector3& end, float t)
 {
-    return Vec3(start.x + (end.x - start.x) * t, start.y + (end.y - start.y) * t, start.z + (end.z - start.z) * t);
+    return Vector3(start.x + (end.x - start.x) * t, start.y + (end.y - start.y) * t, start.z + (end.z - start.z) * t);
 }
 
 /**
@@ -234,7 +234,7 @@ Vec3 lerp(const Vec3& start, const Vec3& end, float t)
  * \param t
  * \return A normalized linearly interpolated vector
  */
-Vec3 slerp(const Vec3& start, const Vec3& end, float t)
+Vector3 slerp(const Vector3& start, const Vector3& end, float t)
 {
     /*
      * When the value of t is close to 0, slerp will yield unexpected results.
@@ -245,8 +245,8 @@ Vec3 slerp(const Vec3& start, const Vec3& end, float t)
         return lerp(start, end, t);
     }
 
-    Vec3 from = normalized(start);
-    Vec3 to   = normalized(end);
+    Vector3 from = normalized(start);
+    Vector3 to   = normalized(end);
 
     float theta     = angle(from, to);
     float sin_theta = sinf(theta);
@@ -270,7 +270,7 @@ Vec3 slerp(const Vec3& start, const Vec3& end, float t)
  * \param t
  * \return A normalized linearly interpolated vector
  */
-Vec3 nlerp(const Vec3& start, const Vec3& end, float t)
+Vector3 nlerp(const Vector3& start, const Vector3& end, float t)
 {
     return normalized(lerp(start, end, t));
 }
@@ -280,7 +280,7 @@ Vec3 nlerp(const Vec3& start, const Vec3& end, float t)
  *
  * \return
  */
-void Vec3::normalize()
+void Vector3::normalize()
 {
     float length_sq = this->x * this->x + this->y * this->y + this->z * this->z;
     if(length_sq < constants::EPSILON)
@@ -293,13 +293,13 @@ void Vec3::normalize()
     this->z *= inverted_length;
 }
 
-bool Vec3::operator==(const Vec3& other)
+bool Vector3::operator==(const Vector3& other)
 {
-    Vec3 diff(*this - other);
+    Vector3 diff(*this - other);
     return lengthSq(diff) < constants::EPSILON;
 }
 
-bool Vec3::operator!=(const Vec3& other)
+bool Vector3::operator!=(const Vector3& other)
 {
     return !(*this == other);
 }

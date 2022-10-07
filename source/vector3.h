@@ -7,7 +7,7 @@ namespace ramanujan
 /**
  * A 3D vector construct.
  */
-struct Vec3
+struct Vector3
 {
     union
     {
@@ -20,50 +20,50 @@ struct Vec3
         float v[3];
     };
 
-    inline Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
-    inline Vec3(const float& _x, const float& _y, const float& _z) : x(_x), y(_y), z(_z) {}
-    inline Vec3(float* fv) : x(fv[0]), y(fv[1]), z(fv[3]) {}
+    inline Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
+    inline Vector3(const float& _x, const float& _y, const float& _z) : x(_x), y(_y), z(_z) {}
+    inline Vector3(float* fv) : x(fv[0]), y(fv[1]), z(fv[3]) {}
 
     void normalize();
-    bool operator==(const Vec3& other);
-    bool operator!=(const Vec3& other);
+    bool operator==(const Vector3& other);
+    bool operator!=(const Vector3& other);
 
     // Operators are defined as friend functions as we would like to keep the state of vectors unaffected by the
     // operations.
 
-    friend Vec3  operator+(const Vec3& a, const Vec3& b);
-    friend Vec3  operator-(const Vec3& a, const Vec3& b);
-    friend Vec3  operator*(const Vec3& a, float scaling_factor);
-    friend Vec3  operator*(float scaling_factor, const Vec3& a);
-    friend Vec3  operator*(const Vec3& a, const Vec3& b);
-    friend float dot(const Vec3& a, const Vec3& b);
-    friend float lengthSq(const Vec3& a);
-    friend float length(const Vec3& a);
-    friend float distance(const Vec3& a, const Vec3& b);
-    friend Vec3  normalized(const Vec3 a);
+    friend Vector3 operator+(const Vector3& a, const Vector3& b);
+    friend Vector3 operator-(const Vector3& a, const Vector3& b);
+    friend Vector3 operator*(const Vector3& a, float scaling_factor);
+    friend Vector3 operator*(float scaling_factor, const Vector3& a);
+    friend Vector3 operator*(const Vector3& a, const Vector3& b);
+    friend float   dot(const Vector3& a, const Vector3& b);
+    friend float   lengthSq(const Vector3& a);
+    friend float   length(const Vector3& a);
+    friend float   distance(const Vector3& a, const Vector3& b);
+    friend Vector3 normalized(const Vector3 a);
 
     /**
      * This method returns projection of vector A onto vector B.
      */
-    friend Vec3 projection(const Vec3& a, const Vec3& b);
+    friend Vector3 projection(const Vector3& a, const Vector3& b);
 
     /**
      * This method returns rejection of vector A onto vector B.
      */
-    friend Vec3 rejection(const Vec3& a, const Vec3& b);
+    friend Vector3 rejection(const Vector3& a, const Vector3& b);
 
     /**
      * This function calculates the angle between two vectors in radians.
      */
-    friend float angle(const Vec3& a, const Vec3& b);
+    friend float angle(const Vector3& a, const Vector3& b);
 
     /**
      * This method returns reflection of vector A on a surface with
      * surface normal given by vector B.
      */
-    friend Vec3 reflection(const Vec3& a, const Vec3& b);
+    friend Vector3 reflection(const Vector3& a, const Vector3& b);
 
-    friend Vec3 cross(const Vec3& a, const Vec3& b);
+    friend Vector3 cross(const Vector3& a, const Vector3& b);
 
     /**
      * Linear interpolation can be calculated by scaling the difference between the two vectors,
@@ -81,7 +81,7 @@ struct Vec3
      * \param t The amount to lerp by
      * \return A linearly interpolated vector
      */
-    friend Vec3 lerp(const Vec3& start, const Vec3& end, float t);
+    friend Vector3 lerp(const Vector3& start, const Vector3& end, float t);
 
     /**
      * Sometimes, the shortest path obtained between by linearly interpolating between two vectors
@@ -97,7 +97,7 @@ struct Vec3
      * \param t
      * \return A normalized linearly interpolated vector
      */
-    friend Vec3 slerp(const Vec3& start, const Vec3& end, float t);
+    friend Vector3 slerp(const Vector3& start, const Vector3& end, float t);
 
     /**
      * Normalized linear interpolation closely approximates spherical linear interpolation,
@@ -112,6 +112,6 @@ struct Vec3
      * \param t
      * \return A normalized linearly interpolated vector
      */
-    friend Vec3 nlerp(const Vec3& start, const Vec3& end, float t);
+    friend Vector3 nlerp(const Vector3& start, const Vector3& end, float t);
 };
 } // namespace ramanujan
