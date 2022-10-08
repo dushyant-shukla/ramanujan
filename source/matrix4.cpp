@@ -63,40 +63,6 @@ Matrix4 operator*(const Matrix4& a, float f)
                    a.tw * f);
 }
 
-#define M4_SWAP(x, y) \
-    {                 \
-        float t = x;  \
-        x       = y;  \
-        y       = t;  \
-    }
-
-/**
- * Transposing a matrix is useful if you need to convert a matrix from row-major to column-major or vice versa.
- *
- * \param m Matrix to be transposed
- */
-void Matrix4::Transpose(Matrix4& m)
-{
-    M4_SWAP(m.yx, m.xy);
-    M4_SWAP(m.zx, m.xz);
-    M4_SWAP(m.tx, m.xw);
-    M4_SWAP(m.zy, m.yz);
-    M4_SWAP(m.ty, m.yw);
-    M4_SWAP(m.tz, m.zw);
-}
-
-/**
- * Transposing a matrix is useful if you need to convert a matrix from row-major to column-major or vice versa.
- *
- * \param m Matrix to be transposed
- * \return Transposed matrix
- */
-Matrix4 Matrix4::Transposed(const Matrix4& m)
-{
-    // Transpose is converting a column-major matrix to a row-major matrix here
-    return Matrix4(m.xx, m.yx, m.zx, m.tx, m.xy, m.yy, m.zy, m.ty, m.xz, m.yz, m.zz, m.tz, m.xw, m.yw, m.zw, m.tw);
-}
-
 // In column-major matrix, c[r, c] = c * R + r
 // Each element in the matrix multiplication can be described as the dot product between the corresponding row of the
 // first matrix, and the corresponding column of the second matrix. In  short, M[i, j] = Ri(A) dot Ci(B)
@@ -140,21 +106,55 @@ Vector4 operator*(const Matrix4& m, const Vector4& v)
                    M4_V4_DOT(3, v.x, v.y, v.z, v.w));
 }
 
-Vector3 Matrix4::TransformVector(const Matrix4& m, const Vector3& v)
+#define M4_SWAP(x, y) \
+    {                 \
+        float t = x;  \
+        x       = y;  \
+        y       = t;  \
+    }
+
+/**
+ * Transposing a matrix is useful if you need to convert a matrix from row-major to column-major or vice versa.
+ *
+ * \param m Matrix to be transposed
+ */
+void Transpose(Matrix4& m)
+{
+    M4_SWAP(m.yx, m.xy);
+    M4_SWAP(m.zx, m.xz);
+    M4_SWAP(m.tx, m.xw);
+    M4_SWAP(m.zy, m.yz);
+    M4_SWAP(m.ty, m.yw);
+    M4_SWAP(m.tz, m.zw);
+}
+
+/**
+ * Transposing a matrix is useful if you need to convert a matrix from row-major to column-major or vice versa.
+ *
+ * \param m Matrix to be transposed
+ * \return Transposed matrix
+ */
+Matrix4 Transposed(const Matrix4& m)
+{
+    // Transpose is converting a column-major matrix to a row-major matrix here
+    return Matrix4(m.xx, m.yx, m.zx, m.tx, m.xy, m.yy, m.zy, m.ty, m.xz, m.yz, m.zz, m.tz, m.xw, m.yw, m.zw, m.tw);
+}
+
+Vector3 TransformVector(const Matrix4& m, const Vector3& v)
 {
     return Vector3(M4_V4_DOT(0, v.x, v.y, v.z, 0.0f),
                    M4_V4_DOT(1, v.x, v.y, v.z, 0.0f),
                    M4_V4_DOT(2, v.x, v.y, v.z, 0.0f));
 }
 
-Vector3 Matrix4::TransformPoint(const Matrix4& m, const Vector3& v)
+Vector3 TransformPoint(const Matrix4& m, const Vector3& v)
 {
     return Vector3(M4_V4_DOT(0, v.x, v.y, v.z, 1.0f),
                    M4_V4_DOT(1, v.x, v.y, v.z, 1.0f),
                    M4_V4_DOT(2, v.x, v.y, v.z, 1.0f));
 }
 
-Vector3 Matrix4::TransformPoint(const Matrix4& m, const Vector3& v, float& w)
+Vector3 TransformPoint(const Matrix4& m, const Vector3& v, float& w)
 {
     float _w = w;
     w        = M4_V4_DOT(3, v.x, v.y, v.z, _w);
@@ -166,13 +166,13 @@ Vector3 Matrix4::TransformPoint(const Matrix4& m, const Vector3& v, float& w)
      x[c1 * 4 + r0] * (x[c0 * 4 + r1] * x[c2 * 4 + r2] - x[c0 * 4 + r2] * x[c2 * 4 + r1]) + \
      x[c2 * 4 + r0] * (x[c0 * 4 + r1] * x[c1 * 4 + r2] - x[c0 * 4 + r2] * x[c1 * 4 + r1]))
 
-float Matrix4::Determinant(const Matrix4& m)
+float Determinant(const Matrix4& m)
 {
     return m.v[0] * M4_3X3MINOR(m.v, 1, 2, 3, 1, 2, 3) - m.v[4] * M4_3X3MINOR(m.v, 0, 2, 3, 1, 2, 3) +
            m.v[8] * M4_3X3MINOR(m.v, 0, 1, 3, 1, 2, 3) - m.v[12] * M4_3X3MINOR(m.v, 0, 1, 2, 1, 2, 3);
 }
 
-Matrix4 Matrix4::Adjugate(const Matrix4& m)
+Matrix4 Adjugate(const Matrix4& m)
 {
     // Cof (M[i, j]) = Minor(M[i, j]] * pow(-1, i + j)
     // Having C1, C2, C3, R1, R2, R3 etc constants would be good instead of these raw indices
@@ -196,7 +196,7 @@ Matrix4 Matrix4::Adjugate(const Matrix4& m)
     return Transposed(cofactor);
 }
 
-Matrix4 Matrix4::Inverse(const Matrix4& m)
+Matrix4 Inverse(const Matrix4& m)
 {
     float det = Determinant(m);
     if(det == 0.0f)
@@ -207,7 +207,7 @@ Matrix4 Matrix4::Inverse(const Matrix4& m)
     return adj * (1.0f / det);
 }
 
-void Matrix4::Invert(Matrix4& m)
+void Invert(Matrix4& m)
 {
     float det = Determinant(m);
     if(det == 0.0f)
