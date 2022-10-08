@@ -129,8 +129,8 @@ Matrix4 operator*(const Matrix4& a, const Matrix4& b)
 // The 4D vector being transformed can be thought of as a matrix with 4 columns and 1 row.
 // When a matrix transforms a vector, it affects both the orientation and scale of the vector (w component of a vector
 // is 0). When a matrix transforms a point, it just translates the point in space (w component of a point is 1).
-#define M4_V4_DOT(m_row, x, y, z, w) \
-    m.v[0 * 4 + m_row] * x + m.v[1 * 4 + m_row] * y + m.v[2 * 4 + m_row] * z + m.v[3 * 4 + m_row] * w
+#define M4_V4_DOT(row_index, x, y, z, w) \
+    m.v[0 * 4 + row_index] * x + m.v[1 * 4 + row_index] * y + m.v[2 * 4 + row_index] * z + m.v[3 * 4 + row_index] * w
 
 Vector4 operator*(const Matrix4& m, const Vector4& v)
 {
@@ -159,6 +159,63 @@ Vector3 Matrix4::TransformPoint(const Matrix4& m, const Vector3& v, float& w)
     float _w = w;
     w        = M4_V4_DOT(3, v.x, v.y, v.z, _w);
     return Vector3(M4_V4_DOT(0, v.x, v.y, v.z, _w), M4_V4_DOT(1, v.x, v.y, v.z, _w), M4_V4_DOT(2, v.x, v.y, v.z, _w));
+}
+
+#define M4_3X3MINOR(x, c0, c1, c2, r0, r1, r2)                                              \
+    (x[c0 * 4 + r0] * (x[c1 * 4 + r1] * x[c2 * 4 + r2] - x[c1 * 4 + r2] * x[c2 * 4 + r1]) - \
+     x[c1 * 4 + r0] * (x[c0 * 4 + r1] * x[c2 * 4 + r2] - x[c0 * 4 + r2] * x[c2 * 4 + r1]) + \
+     x[c2 * 4 + r0] * (x[c0 * 4 + r1] * x[c1 * 4 + r2] - x[c0 * 4 + r2] * x[c1 * 4 + r1]))
+
+float Matrix4::Determinant(const Matrix4& m)
+{
+    return m.v[0] * M4_3X3MINOR(m.v, 1, 2, 3, 1, 2, 3) - m.v[4] * M4_3X3MINOR(m.v, 0, 2, 3, 1, 2, 3) +
+           m.v[8] * M4_3X3MINOR(m.v, 0, 1, 3, 1, 2, 3) - m.v[12] * M4_3X3MINOR(m.v, 0, 1, 2, 1, 2, 3);
+}
+
+Matrix4 Matrix4::Adjugate(const Matrix4& m)
+{
+    // Cof (M[i, j]) = Minor(M[i, j]] * pow(-1, i + j)
+    // Having C1, C2, C3, R1, R2, R3 etc constants would be good instead of these raw indices
+    Matrix4 cofactor;
+    cofactor.v[0]  = M4_3X3MINOR(m.v, 1, 2, 3, 1, 2, 3);
+    cofactor.v[1]  = -M4_3X3MINOR(m.v, 1, 2, 3, 0, 2, 3);
+    cofactor.v[2]  = M4_3X3MINOR(m.v, 1, 2, 3, 0, 1, 3);
+    cofactor.v[3]  = -M4_3X3MINOR(m.v, 1, 2, 3, 0, 1, 2);
+    cofactor.v[4]  = -M4_3X3MINOR(m.v, 0, 2, 3, 1, 2, 3);
+    cofactor.v[5]  = M4_3X3MINOR(m.v, 0, 2, 3, 0, 2, 3);
+    cofactor.v[6]  = -M4_3X3MINOR(m.v, 0, 2, 3, 0, 1, 3);
+    cofactor.v[7]  = M4_3X3MINOR(m.v, 0, 2, 3, 0, 1, 2);
+    cofactor.v[8]  = M4_3X3MINOR(m.v, 0, 1, 3, 1, 2, 3);
+    cofactor.v[9]  = -M4_3X3MINOR(m.v, 0, 1, 3, 0, 2, 3);
+    cofactor.v[10] = M4_3X3MINOR(m.v, 0, 1, 3, 0, 1, 3);
+    cofactor.v[11] = -M4_3X3MINOR(m.v, 0, 1, 3, 0, 1, 2);
+    cofactor.v[12] = -M4_3X3MINOR(m.v, 0, 1, 2, 1, 2, 3);
+    cofactor.v[13] = M4_3X3MINOR(m.v, 0, 1, 2, 0, 2, 3);
+    cofactor.v[14] = -M4_3X3MINOR(m.v, 0, 1, 2, 0, 1, 3);
+    cofactor.v[15] = M4_3X3MINOR(m.v, 0, 1, 2, 0, 1, 2);
+    return Transposed(cofactor);
+}
+
+Matrix4 Matrix4::Inverse(const Matrix4& m)
+{
+    float det = Determinant(m);
+    if(det == 0.0f)
+    {
+        return Matrix4();
+    }
+    Matrix4 adj = Adjugate(m);
+    return adj * (1.0f / det);
+}
+
+void Matrix4::Invert(Matrix4& m)
+{
+    float det = Determinant(m);
+    if(det == 0.0f)
+    {
+        m = Matrix4();
+        return;
+    }
+    m = Adjugate(m) * (1.0f / det);
 }
 
 } // namespace ramanujan

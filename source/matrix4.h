@@ -192,6 +192,10 @@ struct Matrix4
     Vector3 TransformVector(const Matrix4& m, const Vector3& v);
     Vector3 TransformPoint(const Matrix4& m, const Vector3& v);
     Vector3 TransformPoint(const Matrix4& m, const Vector3& v, float& w);
+    float   Determinant(const Matrix4& m);
+    Matrix4 Adjugate(const Matrix4& m);
+    Matrix4 Inverse(const Matrix4& m);
+    void    Invert(Matrix4& m);
 
     friend Matrix4 operator+(const Matrix4& a, const Matrix4& b);
     friend Matrix4 operator*(const Matrix4& a, float f);
