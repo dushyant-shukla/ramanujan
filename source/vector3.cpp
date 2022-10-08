@@ -4,6 +4,18 @@
 
 namespace ramanujan
 {
+
+bool Vector3::operator==(const Vector3& other)
+{
+    Vector3 diff(*this - other);
+    return LengthSq(diff) < constants::EPSILON;
+}
+
+bool Vector3::operator!=(const Vector3& other)
+{
+    return !(*this == other);
+}
+
 Vector3 operator+(const Vector3& a, const Vector3& b)
 {
     Vector3 result(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -47,7 +59,7 @@ Vector3 operator*(const Vector3& a, const Vector3& b)
  * \param b
  * \return
  */
-float dot(const Vector3& a, const Vector3& b)
+float Dot(const Vector3& a, const Vector3& b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -58,7 +70,7 @@ float dot(const Vector3& a, const Vector3& b)
  * \param a
  * \return
  */
-float lengthSq(const Vector3& a)
+float LengthSq(const Vector3& a)
 {
     return a.x * a.x + a.y * a.y + a.z * a.z;
 }
@@ -69,7 +81,7 @@ float lengthSq(const Vector3& a)
  * \param a
  * \return
  */
-float length(const Vector3& a)
+float Length(const Vector3& a)
 {
     float length_sq = a.x * a.x + a.y * a.y + a.z * a.z;
     if(length_sq < constants::EPSILON)
@@ -86,9 +98,22 @@ float length(const Vector3& a)
  * \param b
  * \return
  */
-float distance(const Vector3& a, const Vector3& b)
+float Distance(const Vector3& a, const Vector3& b)
 {
-    return length(a - b);
+    return Length(a - b);
+}
+
+void Normalize(Vector3& a)
+{
+    float length_sq = a.x * a.x + a.y * a.y + a.z * a.z;
+    if(length_sq < constants::EPSILON)
+    {
+        return;
+    }
+    float inverted_length = 1.0f / sqrtf(length_sq);
+    a.x *= inverted_length;
+    a.y *= inverted_length;
+    a.z *= inverted_length;
 }
 
 /**
@@ -97,7 +122,7 @@ float distance(const Vector3& a, const Vector3& b)
  * \param a
  * \return
  */
-Vector3 normalized(const Vector3 a)
+Vector3 Normalized(const Vector3 a)
 {
     float length_sq = a.x * a.x + a.y * a.y + a.z * a.z;
     if(length_sq < constants::EPSILON)
@@ -117,9 +142,9 @@ Vector3 normalized(const Vector3 a)
  * \param v The vector being projected onto.
  * \return The projection of current vector (*this) onto vector v.
  */
-Vector3 projection(const Vector3& a, const Vector3& b)
+Vector3 Projection(const Vector3& a, const Vector3& b)
 {
-    float mag_b_sq = lengthSq(b);
+    float mag_b_sq = LengthSq(b);
     if(mag_b_sq < constants::EPSILON)
     {
         return Vector3();
@@ -130,7 +155,7 @@ Vector3 projection(const Vector3& a, const Vector3& b)
      * given by a dot product between A and B. However, if neither input vector is normalized,
      * the dot product needs to be divided by the length of vector B (the vector being projected onto).
      */
-    float scale = dot(a, b) / mag_b_sq;
+    float scale = Dot(a, b) / mag_b_sq;
 
     /*
      * Now that the parallel component of A with respect to B is known, vector B can be scaled
@@ -143,12 +168,12 @@ Vector3 projection(const Vector3& a, const Vector3& b)
 /**
  * Rejection of vector A onto vector B is the opposite of projection of vector A onto vector B.
  */
-Vector3 rejection(const Vector3& a, const Vector3& b)
+Vector3 Rejection(const Vector3& a, const Vector3& b)
 {
     /*
      * To find rejection of A onto B, subtract the projection of A onto B from vector A.
      */
-    Vector3 proj_a_on_b = projection(a, b);
+    Vector3 proj_a_on_b = Projection(a, b);
     return a - proj_a_on_b;
 }
 
@@ -159,7 +184,7 @@ Vector3 rejection(const Vector3& a, const Vector3& b)
  * \param b
  * \return
  */
-float angle(const Vector3& a, const Vector3& b)
+float Angle(const Vector3& a, const Vector3& b)
 {
     float sq_mag_v1 = a.x * a.x + a.y * a.y + a.z * a.z;
     float sq_mag_v2 = b.x * b.x + b.y * b.y + b.z * b.z;
@@ -174,16 +199,9 @@ float angle(const Vector3& a, const Vector3& b)
     return acosf(dot / length);
 }
 
-/**
- * .
- *
- * \param a
- * \param b
- * \return
- */
-Vector3 reflection(const Vector3& a, const Vector3& b)
+Vector3 Reflection(const Vector3& a, const Vector3& b)
 {
-    Vector3 proj_a_on_b = projection(a, b);
+    Vector3 proj_a_on_b = Projection(a, b);
     return a - (2 * proj_a_on_b);
 }
 
@@ -194,7 +212,7 @@ Vector3 reflection(const Vector3& a, const Vector3& b)
  * \param b
  * \return
  */
-Vector3 cross(const Vector3& a, const Vector3& b)
+Vector3 Cross(const Vector3& a, const Vector3& b)
 {
     return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
@@ -215,7 +233,7 @@ Vector3 cross(const Vector3& a, const Vector3& b)
  * \param t The amount to lerp by
  * \return A linearly interpolated vector
  */
-Vector3 lerp(const Vector3& start, const Vector3& end, float t)
+Vector3 Lerp(const Vector3& start, const Vector3& end, float t)
 {
     return Vector3(start.x + (end.x - start.x) * t, start.y + (end.y - start.y) * t, start.z + (end.z - start.z) * t);
 }
@@ -234,7 +252,7 @@ Vector3 lerp(const Vector3& start, const Vector3& end, float t)
  * \param t
  * \return A normalized linearly interpolated vector
  */
-Vector3 slerp(const Vector3& start, const Vector3& end, float t)
+Vector3 Slerp(const Vector3& start, const Vector3& end, float t)
 {
     /*
      * When the value of t is close to 0, slerp will yield unexpected results.
@@ -242,13 +260,13 @@ Vector3 slerp(const Vector3& start, const Vector3& end, float t)
      */
     if(t < 0.01f)
     {
-        return lerp(start, end, t);
+        return Lerp(start, end, t);
     }
 
-    Vector3 from = normalized(start);
-    Vector3 to   = normalized(end);
+    Vector3 from = Normalized(start);
+    Vector3 to   = Normalized(end);
 
-    float theta     = angle(from, to);
+    float theta     = Angle(from, to);
     float sin_theta = sinf(theta);
 
     float a = sinf((1.0f - t) * theta) / sin_theta;
@@ -270,37 +288,9 @@ Vector3 slerp(const Vector3& start, const Vector3& end, float t)
  * \param t
  * \return A normalized linearly interpolated vector
  */
-Vector3 nlerp(const Vector3& start, const Vector3& end, float t)
+Vector3 Nlerp(const Vector3& start, const Vector3& end, float t)
 {
-    return normalized(lerp(start, end, t));
+    return Normalized(Lerp(start, end, t));
 }
 
-/**
- * .
- *
- * \return
- */
-void Vector3::normalize()
-{
-    float length_sq = this->x * this->x + this->y * this->y + this->z * this->z;
-    if(length_sq < constants::EPSILON)
-    {
-        return;
-    }
-    float inverted_length = 1.0f / sqrtf(length_sq);
-    this->x *= inverted_length;
-    this->y *= inverted_length;
-    this->z *= inverted_length;
-}
-
-bool Vector3::operator==(const Vector3& other)
-{
-    Vector3 diff(*this - other);
-    return lengthSq(diff) < constants::EPSILON;
-}
-
-bool Vector3::operator!=(const Vector3& other)
-{
-    return !(*this == other);
-}
 } // namespace ramanujan

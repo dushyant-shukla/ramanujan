@@ -6,7 +6,7 @@
 namespace ramanujan
 {
 
-Matrix4& CameraTransforms::Frustrum(float left, float right, float bottom, float top, float near, float far)
+Matrix4 Frustrum(float left, float right, float bottom, float top, float near, float far)
 {
     if(left == right || top == bottom || near == far) // check for invalid boundary parameters
     {
@@ -30,14 +30,14 @@ Matrix4& CameraTransforms::Frustrum(float left, float right, float bottom, float
                    0);
 }
 
-Matrix4& CameraTransforms::Perspective(float fov, float aspect, float near, float far)
+Matrix4 Perspective(float fov, float aspect, float near, float far)
 {
     float ymax = near * tanf(fov * 3.14159265359f / 360.0f);
     float xmax = ymax * aspect;
     return Frustrum(-xmax, xmax, -ymax, ymax, near, far);
 }
 
-Matrix4& CameraTransforms::Ortho(float left, float right, float bottom, float top, float near, float far)
+Matrix4 Ortho(float left, float right, float bottom, float top, float near, float far)
 {
     if(left == right || top == bottom || near == far) // check for invalid boundary conditions
     {
@@ -61,17 +61,17 @@ Matrix4& CameraTransforms::Ortho(float left, float right, float bottom, float to
                    1);
 }
 
-Matrix4& CameraTransforms::LookAt(const Vector3& position, const Vector3& target, const Vector3& up)
+Matrix4 LookAt(const Vector3& position, const Vector3& target, const Vector3& up)
 {
-    Vector3 f = normalized(target - position) * -1.0f;
-    Vector3 r = cross(up, f); // Right handed
+    Vector3 f = Normalized(target - position) * -1.0f;
+    Vector3 r = Cross(up, f); // Right handed
     if(r == Vector3(0, 0, 0))
     {
         return Matrix4(); // Error
     }
-    r.normalize();
-    Vector3 u = normalized(cross(f, r)); // Right handed
-    Vector3 t = Vector3(-dot(r, position), -dot(u, position), -dot(f, position));
+    Normalize(r);
+    Vector3 u = Normalized(Cross(f, r)); // Right handed
+    Vector3 t = Vector3(-Dot(r, position), -Dot(u, position), -Dot(f, position));
     return Matrix4(
         // Transpose upper 3x3 matrix to invert it
         r.x,
