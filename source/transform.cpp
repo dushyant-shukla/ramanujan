@@ -1,7 +1,6 @@
 #include "transform.h"
 #include "constants.h"
 #include "quaternion.h"
-#include "vector3.h"
 
 #include <math.h>
 
