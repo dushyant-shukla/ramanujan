@@ -62,6 +62,15 @@ Vector3 operator*(const Quaternion& q, const Vector3& v)
            Cross(q.vector, v) * 2.0f * q.scalar;
 }
 
+Quaternion operator^(const Quaternion& q, float t)
+{
+    float   angle   = 2.0f * acosf(q.scalar);
+    Vector3 axis    = Normalized(q.vector);
+    float   halfCos = cosf(t * angle * 0.5f);
+    float   halfSin = sinf(t * angle * 0.5f);
+    return Quaternion(axis.x * halfSin, axis.y * halfSin, axis.z * halfSin, halfCos);
+}
+
 bool SameOrientation(const Quaternion& left, const Quaternion& right)
 {
     return (fabsf(left.x - right.x) <= constants::EPSILON && fabsf(left.y - right.y) <= constants::EPSILON &&
@@ -202,6 +211,63 @@ Vector3 GetAxis(const Quaternion& q)
 float GetAngle(const Quaternion& q)
 {
     return 2.0f * acosf(q.w);
+}
+
+Matrix4 ToMatrix4(const Quaternion& q)
+{
+    Vector3 r = q * Vector3(1, 0, 0);
+    Vector3 u = q * Vector3(0, 1, 0);
+    Vector3 f = q * Vector3(0, 0, 1);
+    return Matrix4(r.x, r.y, r.z, 0, u.x, u.y, u.z, 0, f.x, f.y, f.z, 0, 0, 0, 0, 1);
+}
+
+Quaternion ToQuaternion(const Matrix4& m)
+{
+    Vector3 up      = Normalized(Vector3(m.up.x, m.up.y, m.up.z));
+    Vector3 forward = Normalized(Vector3(m.forward.x, m.forward.y, m.forward.z));
+    Vector3 right   = Cross(up, forward);
+    up              = Cross(forward, right);
+    return LookRotation(forward, up);
+}
+
+Quaternion LookRotation(const Vector3& direction, const Vector3& up)
+{
+    // Find orthonormal basis vectors
+    Vector3 f = Normalized(direction); // Object Forward
+    Vector3 u = Normalized(up);        // Desired Up
+    Vector3 r = Cross(u, f);           // Object Right
+    u         = Cross(f, r);           // Object Up
+    // From world forward to object forward
+    Quaternion worldToObject = FromTo(Vector3(0, 0, 1), f);
+    // what direction is the new object up?
+    Vector3 objectUp = worldToObject * Vector3(0, 1, 0);
+    // From object up to desired up
+    Quaternion u2u = FromTo(objectUp, u);
+    // Rotate to forward direction first
+    // then twist to correct up
+    Quaternion result = worldToObject * u2u;
+    // Don't forget to normalize the result
+    return Normalized(result);
+}
+
+Quaternion Mix(const Quaternion& from, const Quaternion& to, float t)
+{
+    return from * (1.0f - t) + to * t;
+}
+
+Quaternion Nlerp(const Quaternion& from, const Quaternion& to, float t)
+{
+    return Normalized(from + (to - from) * t);
+}
+
+Quaternion Slerp(const Quaternion& from, const Quaternion& to, float t)
+{
+    if(fabsf(Dot(from, to)) > 1.0f - constants::EPSILON)
+    {
+        return Nlerp(from, to, t);
+    }
+    Quaternion delta = Inverse(from) * to;
+    return Normalized((delta ^ t) * from);
 }
 
 } // namespace ramanujan

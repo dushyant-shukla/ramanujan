@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector3.h"
+#include "matrix4.h"
 
 namespace ramanujan
 {
@@ -45,6 +46,7 @@ bool       operator==(const Quaternion& left, const Quaternion& right);
 bool       operator!=(const Quaternion& left, const Quaternion& right);
 Quaternion operator*(const Quaternion& left, const Quaternion& right);
 Vector3    operator*(const Quaternion& q, const Vector3& v);
+Quaternion operator^(const Quaternion& q, float t);
 bool       SameOrientation(const Quaternion& left, const Quaternion& right);
 float      Dot(const Quaternion& a, const Quaternion& b);
 float      LengthSq(const Quaternion& q);
@@ -71,5 +73,17 @@ Quaternion FromTo(const Vector3& from, const Vector3& to);
 Vector3 GetAxis(const Quaternion& q);
 
 float GetAngle(const Quaternion& q);
+
+Matrix4 ToMatrix4(const Quaternion& q);
+
+Quaternion ToQuaternion(const Matrix4& m);
+
+Quaternion LookRotation(const Vector3& direction, const Vector3& up);
+
+Quaternion Mix(const Quaternion& from, const Quaternion& to, float t);
+
+Quaternion Nlerp(const Quaternion& from, const Quaternion& to, float t);
+
+Quaternion Slerp(const Quaternion& from, const Quaternion& to, float t);
 
 } // namespace ramanujan
