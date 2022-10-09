@@ -238,14 +238,14 @@ Quaternion LookRotation(const Vector3& direction, const Vector3& up)
     Vector3 r = Cross(u, f);           // Object Right
     u         = Cross(f, r);           // Object Up
     // From world forward to object forward
-    Quaternion worldToObject = FromTo(Vector3(0, 0, 1), f);
+    Quaternion world_to_object = FromTo(Vector3(0, 0, 1), f);
     // what direction is the new object up?
-    Vector3 objectUp = worldToObject * Vector3(0, 1, 0);
+    Vector3 object_up = world_to_object * Vector3(0, 1, 0);
     // From object up to desired up
-    Quaternion u2u = FromTo(objectUp, u);
+    Quaternion u2u = FromTo(object_up, u);
     // Rotate to forward direction first
     // then twist to correct up
-    Quaternion result = worldToObject * u2u;
+    Quaternion result = world_to_object * u2u;
     // Don't forget to normalize the result
     return Normalized(result);
 }
