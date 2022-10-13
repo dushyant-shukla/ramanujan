@@ -59,7 +59,7 @@ Quaternion Inverse(const Quaternion& q);
 /**
  * This method encodes an angle and an axis of rotation into a quaternion.
  *
- * \param theta The angle of rotation
+ * \param theta The angle of rotation in radians
  * \param axis The axis of rotation
  * \return A quaternion representing the rotation
  */
