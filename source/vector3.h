@@ -14,8 +14,8 @@ struct Vector3
         struct
         {
             float x;
-            float z;
             float y;
+            float z;
         };
         float v[3];
     };
