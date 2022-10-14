@@ -257,6 +257,7 @@ Quaternion Mix(const Quaternion& from, const Quaternion& to, float t)
 
 Quaternion Nlerp(const Quaternion& from, const Quaternion& to, float t)
 {
+    // Observe that Nlerp(from, to, t) = Normalized(Mix(from, to, t))
     return Normalized(from + (to - from) * t);
 }
 
