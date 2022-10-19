@@ -36,6 +36,8 @@ struct Quaternion
     inline Quaternion() : x(0), y(0), z(0), w(1) {}
 
     inline Quaternion(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+
+    inline Quaternion(float* fv) : x(fv[0]), y(fv[1]), z(fv[2]), w(fv[3]) {}
 };
 
 Quaternion operator+(const Quaternion& a, const Quaternion& b);
