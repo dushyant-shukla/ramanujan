@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vector3.h"
 #include "matrix4.h"
+#include "vector3.h"
 
 namespace ramanujan
 {
@@ -57,6 +57,23 @@ void       Normalize(Quaternion& q);
 Quaternion Normalized(const Quaternion& q);
 Quaternion Conjugate(const Quaternion& q);
 Quaternion Inverse(const Quaternion& q);
+Vector3    RotateVector(const Quaternion& q, const Vector3& v);
+
+/**
+ * This function constructs a quaternion from euler angles (in radians). The rotation order is XYZ.
+ * @param x The angle on the x axis (in radians)
+ * @param y The angle on the y axis (in radians)
+ * @param z The angle on the z axis (in radians)
+ */
+Quaternion FromEulerAnglesRadians(float x, float y, float z);
+
+/**
+ * This function constructs a quaternion from euler angles (in degrees). The rotation order is XYZ.
+ * @param x The angle on the x axis (in degrees)
+ * @param y The angle on the y axis (in degrees)
+ * @param z The angle on the z axis (in degrees)
+ */
+Quaternion FromEulerAnglesDegrees(float x, float y, float z);
 
 /**
  * This method encodes an angle and an axis of rotation into a quaternion.

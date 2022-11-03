@@ -155,6 +155,36 @@ Quaternion Inverse(const Quaternion& q)
     return Quaternion(-q.x * reciprocal, -q.y * reciprocal, -q.z * reciprocal, q.w * reciprocal);
 }
 
+Vector3 RotateVector(const Quaternion& q, const Vector3& v)
+{
+    return q * v;
+}
+
+Quaternion FromEulerAnglesRadians(float x, float y, float z)
+{
+    float c_x = cosf(x / 2.0f);
+    float c_y = cosf(y / 2.0f);
+    float c_z = cosf(z / 2.0f);
+
+    float s_x = sinf(x / 2.0f);
+    float s_y = sinf(y / 2.0f);
+    float s_z = sinf(z / 2.0f);
+
+    Quaternion q_x(s_x, 0, 0, c_x);
+    Quaternion q_y(0, s_y, 0, c_y);
+    Quaternion q_z(0, 0, s_z, c_z);
+
+    return q_x * q_y * q_z; // Rotation order: XYZ
+}
+
+Quaternion FromEulerAnglesDegrees(float x, float y, float z)
+{
+    float rad_x = x * ramanujan::constants::DEG_TO_RAD;
+    float rad_y = y * ramanujan::constants::DEG_TO_RAD;
+    float rad_z = z * ramanujan::constants::DEG_TO_RAD;
+    return FromEulerAnglesRadians(rad_x, rad_y, rad_z);
+}
+
 Quaternion AngleAxis(float theta, const Vector3& axis)
 {
     // Quaternions are created using an angle and an axis of rotation. A rotation of angle(theta) about an axis, can be
