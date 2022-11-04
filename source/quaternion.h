@@ -3,6 +3,8 @@
 #include "matrix4.h"
 #include "vector3.h"
 
+#include <utility>
+
 namespace ramanujan
 {
 
@@ -38,6 +40,15 @@ struct Quaternion
     inline Quaternion(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
 
     inline Quaternion(float* fv) : x(fv[0]), y(fv[1]), z(fv[2]), w(fv[3]) {}
+
+    inline Quaternion(const Quaternion& other) : scalar(other.scalar), vector(other.vector) {}
+
+    inline Quaternion& operator=(const Quaternion& other)
+    {
+        Quaternion temp(other);
+        std::swap(*this, temp);
+        return *this;
+    }
 };
 
 Quaternion operator+(const Quaternion& a, const Quaternion& b);
