@@ -45,9 +45,13 @@ struct Quaternion
 
     inline Quaternion& operator=(const Quaternion& other)
     {
-        Quaternion temp(other);
-        std::swap(*this, temp);
+        this->scalar = other.scalar;
+        this->vector = other.vector;
         return *this;
+        // This is causing troubles
+        //Quaternion temp(other);
+        //std::swap(*this, temp);
+        //return *this;
     }
 };
 
