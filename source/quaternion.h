@@ -43,16 +43,7 @@ struct Quaternion
 
     inline Quaternion(const Quaternion& other) : scalar(other.scalar), vector(other.vector) {}
 
-    inline Quaternion& operator=(const Quaternion& other)
-    {
-        this->scalar = other.scalar;
-        this->vector = other.vector;
-        return *this;
-        // This is causing troubles
-        //Quaternion temp(other);
-        //std::swap(*this, temp);
-        //return *this;
-    }
+    Quaternion& operator=(const Quaternion& other);
 };
 
 Quaternion operator+(const Quaternion& a, const Quaternion& b);

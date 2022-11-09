@@ -6,6 +6,18 @@
 namespace ramanujan
 {
 
+Quaternion& Quaternion::operator=(const Quaternion& other)
+{
+    this->scalar = other.scalar;
+    this->vector = other.vector;
+    return *this;
+
+    // This implementation is causing troubles
+    // Quaternion temp(other);
+    // std::swap(*this, temp);
+    // return *this;
+}
+
 Quaternion operator+(const Quaternion& a, const Quaternion& b)
 {
     return Quaternion(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
