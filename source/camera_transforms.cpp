@@ -6,7 +6,7 @@
 namespace ramanujan
 {
 
-Matrix4 Frustrum(float left, float right, float bottom, float top, float near, float far)
+Matrix4 Frustrum(real left, real right, real bottom, real top, real near, real far)
 {
     if(left == right || top == bottom || near == far) // check for invalid boundary parameters
     {
@@ -30,14 +30,14 @@ Matrix4 Frustrum(float left, float right, float bottom, float top, float near, f
                    0);
 }
 
-Matrix4 Perspective(float fov, float aspect, float near, float far)
+Matrix4 Perspective(real fov, real aspect, real near, real far)
 {
-    float ymax = near * tanf(fov * 3.14159265359f / 360.0f);
-    float xmax = ymax * aspect;
+    real ymax = near * tanf(fov * 3.14159265359f / 360.0f);
+    real xmax = ymax * aspect;
     return Frustrum(-xmax, xmax, -ymax, ymax, near, far);
 }
 
-Matrix4 Ortho(float left, float right, float bottom, float top, float near, float far)
+Matrix4 Ortho(real left, real right, real bottom, real top, real near, real far)
 {
     if(left == right || top == bottom || near == far) // check for invalid boundary conditions
     {

@@ -7,9 +7,9 @@ namespace ramanujan
 
 struct Vector3;
 
-Matrix4 Frustrum(float left, float right, float bottom, float top, float near, float far);
-Matrix4 Perspective(float fov, float aspect, float near, float far);
-Matrix4 Ortho(float left, float right, float bottom, float top, float near, float far);
+Matrix4 Frustrum(real left, real right, real bottom, real top, real near, real far);
+Matrix4 Perspective(real fov, real aspect, real near, real far);
+Matrix4 Ortho(real left, real right, real bottom, real top, real near, real far);
 Matrix4 LookAt(const Vector3& position, const Vector3& target, const Vector3& up);
 
 } // namespace ramanujan

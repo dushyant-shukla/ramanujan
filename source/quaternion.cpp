@@ -28,7 +28,7 @@ Quaternion operator-(const Quaternion& a, const Quaternion& b)
     return Quaternion(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
-Quaternion operator*(const Quaternion& q, float s)
+Quaternion operator*(const Quaternion& q, real s)
 {
     return Quaternion(q.x * s, q.y * s, q.z * s, q.w * s);
 }
@@ -40,8 +40,8 @@ Quaternion operator-(const Quaternion& q)
 
 bool operator==(const Quaternion& left, const Quaternion& right)
 {
-    return (fabsf(left.x - right.x) <= constants::EPSILON && fabsf(left.y - right.y) <= constants::EPSILON &&
-            fabsf(left.z - right.z) <= constants::EPSILON && fabsf(left.w - right.w) <= constants::EPSILON);
+    return (fabsf(left.x - right.x) <= Constants::EPSILON && fabsf(left.y - right.y) <= Constants::EPSILON &&
+            fabsf(left.z - right.z) <= Constants::EPSILON && fabsf(left.w - right.w) <= Constants::EPSILON);
 }
 
 bool operator!=(const Quaternion& left, const Quaternion& right)
@@ -74,27 +74,27 @@ Vector3 operator*(const Quaternion& q, const Vector3& v)
            Cross(q.vector, v) * 2.0f * q.scalar;
 }
 
-Quaternion operator^(const Quaternion& q, float t)
+Quaternion operator^(const Quaternion& q, real t)
 {
-    float   angle   = 2.0f * acosf(q.scalar);
+    real    angle   = 2.0f * acosf(q.scalar);
     Vector3 axis    = Normalized(q.vector);
-    float   halfCos = cosf(t * angle * 0.5f);
-    float   halfSin = sinf(t * angle * 0.5f);
+    real    halfCos = cosf(t * angle * 0.5f);
+    real    halfSin = sinf(t * angle * 0.5f);
     return Quaternion(axis.x * halfSin, axis.y * halfSin, axis.z * halfSin, halfCos);
 }
 
 bool SameOrientation(const Quaternion& left, const Quaternion& right)
 {
-    return (fabsf(left.x - right.x) <= constants::EPSILON && fabsf(left.y - right.y) <= constants::EPSILON &&
-            fabsf(left.z - right.z) <= constants::EPSILON && fabsf(left.w - right.w) <= constants::EPSILON) ||
-           (fabsf(left.x + right.x) <= constants::EPSILON && fabsf(left.y + right.y) <= constants::EPSILON &&
-            fabsf(left.z + right.z) <= constants::EPSILON && fabsf(left.w + right.w) <= constants::EPSILON);
+    return (fabsf(left.x - right.x) <= Constants::EPSILON && fabsf(left.y - right.y) <= Constants::EPSILON &&
+            fabsf(left.z - right.z) <= Constants::EPSILON && fabsf(left.w - right.w) <= Constants::EPSILON) ||
+           (fabsf(left.x + right.x) <= Constants::EPSILON && fabsf(left.y + right.y) <= Constants::EPSILON &&
+            fabsf(left.z + right.z) <= Constants::EPSILON && fabsf(left.w + right.w) <= Constants::EPSILON);
 }
 
 /**
  * The dot product measures how similar two quaternions are.
  */
-float Dot(const Quaternion& a, const Quaternion& b)
+real Dot(const Quaternion& a, const Quaternion& b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
@@ -102,15 +102,15 @@ float Dot(const Quaternion& a, const Quaternion& b)
 /**
  * The squared length of a quaternion is the same as the dot product of the quaternion with itself.
  */
-float LengthSq(const Quaternion& q)
+real LengthSq(const Quaternion& q)
 {
     return q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
 }
 
-float Length(const Quaternion& q)
+real Length(const Quaternion& q)
 {
-    float length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
-    if(length_sq < constants::EPSILON)
+    real length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+    if(length_sq < Constants::EPSILON)
     {
         return 0.0f;
     }
@@ -122,12 +122,12 @@ float Length(const Quaternion& q)
  */
 void Normalize(Quaternion& q)
 {
-    float length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
-    if(length_sq < constants::EPSILON)
+    real length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+    if(length_sq < Constants::EPSILON)
     {
         return;
     }
-    float inverse_length = 1.0f / sqrtf(length_sq);
+    real inverse_length = 1.0f / sqrtf(length_sq);
     q.x *= inverse_length;
     q.y *= inverse_length;
     q.z *= inverse_length;
@@ -136,12 +136,12 @@ void Normalize(Quaternion& q)
 
 Quaternion Normalized(const Quaternion& q)
 {
-    float length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
-    if(length_sq < constants::EPSILON)
+    real length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+    if(length_sq < Constants::EPSILON)
     {
         return Quaternion();
     }
-    float inverse_length = 1.0f / sqrtf(length_sq);
+    real inverse_length = 1.0f / sqrtf(length_sq);
     return Quaternion(q.x * inverse_length, q.y * inverse_length, q.z * inverse_length, q.w * inverse_length);
 }
 
@@ -158,12 +158,12 @@ Quaternion Conjugate(const Quaternion& q)
  */
 Quaternion Inverse(const Quaternion& q)
 {
-    float length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
-    if(length_sq < constants::EPSILON)
+    real length_sq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+    if(length_sq < Constants::EPSILON)
     {
         return Quaternion();
     }
-    float reciprocal = 1.0f / length_sq;
+    real reciprocal = 1.0f / length_sq;
     return Quaternion(-q.x * reciprocal, -q.y * reciprocal, -q.z * reciprocal, q.w * reciprocal);
 }
 
@@ -172,15 +172,15 @@ Vector3 RotateVector(const Quaternion& q, const Vector3& v)
     return q * v;
 }
 
-Quaternion FromEulerAnglesRadians(float x, float y, float z)
+Quaternion FromEulerAnglesRadians(real x, real y, real z)
 {
-    float c_x = cosf(x / 2.0f);
-    float c_y = cosf(y / 2.0f);
-    float c_z = cosf(z / 2.0f);
+    real c_x = cosf(x / 2.0f);
+    real c_y = cosf(y / 2.0f);
+    real c_z = cosf(z / 2.0f);
 
-    float s_x = sinf(x / 2.0f);
-    float s_y = sinf(y / 2.0f);
-    float s_z = sinf(z / 2.0f);
+    real s_x = sinf(x / 2.0f);
+    real s_y = sinf(y / 2.0f);
+    real s_z = sinf(z / 2.0f);
 
     Quaternion q_x(s_x, 0, 0, c_x);
     Quaternion q_y(0, s_y, 0, c_y);
@@ -189,15 +189,15 @@ Quaternion FromEulerAnglesRadians(float x, float y, float z)
     return q_x * q_y * q_z; // Rotation order: XYZ
 }
 
-Quaternion FromEulerAnglesDegrees(float x, float y, float z)
+Quaternion FromEulerAnglesDegrees(real x, real y, real z)
 {
-    float rad_x = x * ramanujan::constants::DEG_TO_RAD;
-    float rad_y = y * ramanujan::constants::DEG_TO_RAD;
-    float rad_z = z * ramanujan::constants::DEG_TO_RAD;
+    real rad_x = x * ramanujan::Constants::DEG_TO_RAD;
+    real rad_y = y * ramanujan::Constants::DEG_TO_RAD;
+    real rad_z = z * ramanujan::Constants::DEG_TO_RAD;
     return FromEulerAnglesRadians(rad_x, rad_y, rad_z);
 }
 
-Quaternion AngleAxis(float theta, const Vector3& axis)
+Quaternion AngleAxis(real theta, const Vector3& axis)
 {
     // Quaternions are created using an angle and an axis of rotation. A rotation of angle(theta) about an axis, can be
     // represented on a sphere as any directed arc whose length us 1/2 of angle(theta) on the plane perpendicular to the
@@ -207,7 +207,7 @@ Quaternion AngleAxis(float theta, const Vector3& axis)
     // A quaternion can track two full rotations, which is 720 degrees. This makes the period of a quaternion 720
     // degrees. The period of sin/cos is 360 degrees. Dividing angle(theta) by 2 maps the range of a quaternion to the
     // range of sin/cos.
-    float sin_theta = sinf(theta * 0.50f);
+    real sin_theta = sinf(theta * 0.50f);
 
     return Quaternion(normalized_axis.x * sin_theta,
                       normalized_axis.y * sin_theta,
@@ -250,7 +250,7 @@ Vector3 GetAxis(const Quaternion& q)
     return Normalized(Vector3(q.x, q.y, q.z));
 }
 
-float GetAngle(const Quaternion& q)
+real GetAngle(const Quaternion& q)
 {
     return 2.0f * acosf(q.w);
 }
@@ -292,20 +292,20 @@ Quaternion LookRotation(const Vector3& direction, const Vector3& up)
     return Normalized(result);
 }
 
-Quaternion Mix(const Quaternion& from, const Quaternion& to, float t)
+Quaternion Mix(const Quaternion& from, const Quaternion& to, real t)
 {
     return from * (1.0f - t) + to * t;
 }
 
-Quaternion Nlerp(const Quaternion& from, const Quaternion& to, float t)
+Quaternion Nlerp(const Quaternion& from, const Quaternion& to, real t)
 {
     // Observe that Nlerp(from, to, t) = Normalized(Mix(from, to, t))
     return Normalized(from + (to - from) * t);
 }
 
-Quaternion Slerp(const Quaternion& from, const Quaternion& to, float t)
+Quaternion Slerp(const Quaternion& from, const Quaternion& to, real t)
 {
-    if(fabsf(Dot(from, to)) > 1.0f - constants::EPSILON)
+    if(fabsf(Dot(from, to)) > 1.0f - Constants::EPSILON)
     {
         return Nlerp(from, to, t);
     }

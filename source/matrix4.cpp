@@ -10,7 +10,7 @@ bool Matrix4::operator==(const Matrix4& other)
 {
     for(int i = 0; i < 16; ++i)
     {
-        if(fabsf(v[i] - other.v[i]) > constants::EPSILON)
+        if(fabsf(v[i] - other.v[i]) > Constants::EPSILON)
         {
             return false;
         }
@@ -43,7 +43,7 @@ Matrix4 operator+(const Matrix4& a, const Matrix4& b)
                    a.tw + b.tw);
 }
 
-Matrix4 operator*(const Matrix4& a, float f)
+Matrix4 operator*(const Matrix4& a, real f)
 {
     return Matrix4(a.xx * f,
                    a.xy * f,
@@ -108,9 +108,9 @@ Vector4 operator*(const Matrix4& m, const Vector4& v)
 
 #define M4_SWAP(x, y) \
     {                 \
-        float t = x;  \
-        x       = y;  \
-        y       = t;  \
+        real t = x;   \
+        x      = y;   \
+        y      = t;   \
     }
 
 /**
@@ -154,10 +154,10 @@ Vector3 TransformPoint(const Matrix4& m, const Vector3& v)
                    M4_V4_DOT(2, v.x, v.y, v.z, 1.0f));
 }
 
-Vector3 TransformPoint(const Matrix4& m, const Vector3& v, float& w)
+Vector3 TransformPoint(const Matrix4& m, const Vector3& v, real& w)
 {
-    float _w = w;
-    w        = M4_V4_DOT(3, v.x, v.y, v.z, _w);
+    real _w = w;
+    w       = M4_V4_DOT(3, v.x, v.y, v.z, _w);
     return Vector3(M4_V4_DOT(0, v.x, v.y, v.z, _w), M4_V4_DOT(1, v.x, v.y, v.z, _w), M4_V4_DOT(2, v.x, v.y, v.z, _w));
 }
 
@@ -166,7 +166,7 @@ Vector3 TransformPoint(const Matrix4& m, const Vector3& v, float& w)
      x[c1 * 4 + r0] * (x[c0 * 4 + r1] * x[c2 * 4 + r2] - x[c0 * 4 + r2] * x[c2 * 4 + r1]) + \
      x[c2 * 4 + r0] * (x[c0 * 4 + r1] * x[c1 * 4 + r2] - x[c0 * 4 + r2] * x[c1 * 4 + r1]))
 
-float Determinant(const Matrix4& m)
+real Determinant(const Matrix4& m)
 {
     return m.v[0] * M4_3X3MINOR(m.v, 1, 2, 3, 1, 2, 3) - m.v[4] * M4_3X3MINOR(m.v, 0, 2, 3, 1, 2, 3) +
            m.v[8] * M4_3X3MINOR(m.v, 0, 1, 3, 1, 2, 3) - m.v[12] * M4_3X3MINOR(m.v, 0, 1, 2, 1, 2, 3);
@@ -198,7 +198,7 @@ Matrix4 Adjugate(const Matrix4& m)
 
 Matrix4 Inverse(const Matrix4& m)
 {
-    float det = Determinant(m);
+    real det = Determinant(m);
     if(det == 0.0f)
     {
         return Matrix4();
@@ -209,7 +209,7 @@ Matrix4 Inverse(const Matrix4& m)
 
 void Invert(Matrix4& m)
 {
-    float det = Determinant(m);
+    real det = Determinant(m);
     if(det == 0.0f)
     {
         m = Matrix4();

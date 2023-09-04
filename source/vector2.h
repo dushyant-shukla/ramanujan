@@ -1,5 +1,7 @@
 #pragma once
 
+#include "precision.h"
+
 namespace ramanujan
 {
 template <typename T>
@@ -21,7 +23,7 @@ struct TVector2
     inline TVector2(T* fv) : x(fv[0]), y(fv[1]) {}
 };
 
-typedef TVector2<float>        Vector2;
+typedef TVector2<real>         Vector2;
 typedef TVector2<int>          IVector2;
 typedef TVector2<unsigned int> UIVector2;
 } // namespace ramanujan

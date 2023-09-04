@@ -19,7 +19,7 @@ struct Transform
 
 Transform Combine(const Transform& a, const Transform& b);
 Transform Inverse(const Transform& t);
-Transform Mix(const Transform& a, const Transform& b, float t);
+Transform Mix(const Transform& a, const Transform& b, real t);
 Matrix4   ToMatrix4(const Transform& t);
 Transform ToTransform(const Matrix4& m);
 Vector3   TransformPoint(const Transform& a, const Vector3& point);

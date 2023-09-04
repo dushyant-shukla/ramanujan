@@ -28,16 +28,16 @@ Transform Inverse(const Transform& t)
 {
     Transform inverse;
     inverse.rotation = Inverse(t.rotation);
-    inverse.scale.x  = fabsf(t.scale.x) < constants::EPSILON ? 0.0f : 1.0f / t.scale.x;
-    inverse.scale.y  = fabsf(t.scale.y) < constants::EPSILON ? 0.0f : 1.0f / t.scale.y;
-    inverse.scale.z  = fabsf(t.scale.z) < constants::EPSILON ? 0.0f : 1.0f / t.scale.z;
+    inverse.scale.x  = fabsf(t.scale.x) < Constants::EPSILON ? 0.0f : 1.0f / t.scale.x;
+    inverse.scale.y  = fabsf(t.scale.y) < Constants::EPSILON ? 0.0f : 1.0f / t.scale.y;
+    inverse.scale.z  = fabsf(t.scale.z) < Constants::EPSILON ? 0.0f : 1.0f / t.scale.z;
 
     Vector3 inverse_trans = t.position * (-1.0f);
     inverse.position      = inverse.rotation * (inverse.scale * inverse_trans);
     return inverse;
 }
 
-Transform Mix(const Transform& a, const Transform& b, float t)
+Transform Mix(const Transform& a, const Transform& b, real t)
 {
     Quaternion b_rotation = b.rotation;
     if(Dot(a.rotation, b_rotation) < 0.0f)

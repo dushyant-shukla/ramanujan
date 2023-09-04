@@ -17,19 +17,19 @@ struct Quaternion
     {
         struct
         {
-            float x;
-            float y;
-            float z;
-            float w;
+            real x;
+            real y;
+            real z;
+            real w;
         };
 
         struct
         {
             Vector3 vector;
-            float   scalar;
+            real    scalar;
         };
 
-        float v[4];
+        real v[4];
     };
 
     /**
@@ -37,9 +37,9 @@ struct Quaternion
      */
     inline Quaternion() : x(0), y(0), z(0), w(1) {}
 
-    inline Quaternion(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+    inline Quaternion(real _x, real _y, real _z, real _w) : x(_x), y(_y), z(_z), w(_w) {}
 
-    inline Quaternion(float* fv) : x(fv[0]), y(fv[1]), z(fv[2]), w(fv[3]) {}
+    inline Quaternion(real* fv) : x(fv[0]), y(fv[1]), z(fv[2]), w(fv[3]) {}
 
     inline Quaternion(const Quaternion& other) : scalar(other.scalar), vector(other.vector) {}
 
@@ -48,17 +48,17 @@ struct Quaternion
 
 Quaternion operator+(const Quaternion& a, const Quaternion& b);
 Quaternion operator-(const Quaternion& a, const Quaternion& b);
-Quaternion operator*(const Quaternion& q, float s);
+Quaternion operator*(const Quaternion& q, real s);
 Quaternion operator-(const Quaternion& q);
 bool       operator==(const Quaternion& left, const Quaternion& right);
 bool       operator!=(const Quaternion& left, const Quaternion& right);
 Quaternion operator*(const Quaternion& left, const Quaternion& right);
 Vector3    operator*(const Quaternion& q, const Vector3& v);
-Quaternion operator^(const Quaternion& q, float t);
+Quaternion operator^(const Quaternion& q, real t);
 bool       SameOrientation(const Quaternion& left, const Quaternion& right);
-float      Dot(const Quaternion& a, const Quaternion& b);
-float      LengthSq(const Quaternion& q);
-float      Length(const Quaternion& q);
+real       Dot(const Quaternion& a, const Quaternion& b);
+real       LengthSq(const Quaternion& q);
+real       Length(const Quaternion& q);
 void       Normalize(Quaternion& q);
 Quaternion Normalized(const Quaternion& q);
 Quaternion Conjugate(const Quaternion& q);
@@ -71,7 +71,7 @@ Vector3    RotateVector(const Quaternion& q, const Vector3& v);
  * @param y The angle on the y axis (in radians)
  * @param z The angle on the z axis (in radians)
  */
-Quaternion FromEulerAnglesRadians(float x, float y, float z);
+Quaternion FromEulerAnglesRadians(real x, real y, real z);
 
 /**
  * This function constructs a quaternion from euler angles (in degrees). The rotation order is XYZ.
@@ -79,7 +79,7 @@ Quaternion FromEulerAnglesRadians(float x, float y, float z);
  * @param y The angle on the y axis (in degrees)
  * @param z The angle on the z axis (in degrees)
  */
-Quaternion FromEulerAnglesDegrees(float x, float y, float z);
+Quaternion FromEulerAnglesDegrees(real x, real y, real z);
 
 /**
  * This method encodes an angle and an axis of rotation into a quaternion.
@@ -88,7 +88,7 @@ Quaternion FromEulerAnglesDegrees(float x, float y, float z);
  * \param axis The axis of rotation
  * \return A quaternion representing the rotation
  */
-Quaternion AngleAxis(float theta, const Vector3& axis);
+Quaternion AngleAxis(real theta, const Vector3& axis);
 
 /**
  * .
@@ -97,7 +97,7 @@ Quaternion FromTo(const Vector3& from, const Vector3& to);
 
 Vector3 GetAxis(const Quaternion& q);
 
-float GetAngle(const Quaternion& q);
+real GetAngle(const Quaternion& q);
 
 Matrix4 ToMatrix4(const Quaternion& q);
 
@@ -105,10 +105,10 @@ Quaternion ToQuaternion(const Matrix4& m);
 
 Quaternion LookRotation(const Vector3& direction, const Vector3& up);
 
-Quaternion Mix(const Quaternion& from, const Quaternion& to, float t);
+Quaternion Mix(const Quaternion& from, const Quaternion& to, real t);
 
-Quaternion Nlerp(const Quaternion& from, const Quaternion& to, float t);
+Quaternion Nlerp(const Quaternion& from, const Quaternion& to, real t);
 
-Quaternion Slerp(const Quaternion& from, const Quaternion& to, float t);
+Quaternion Slerp(const Quaternion& from, const Quaternion& to, real t);
 
 } // namespace ramanujan
