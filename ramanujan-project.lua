@@ -9,6 +9,7 @@ objdir("bin-intermediate/" .. outputdir .. "/%{prj.name}")
 files
 {
   "source/**.h",
+  "source/**.hpp",
   "source/**.cpp"
 }
 
