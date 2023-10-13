@@ -613,21 +613,6 @@ bool makeOrthonormalBasis(Vector<T, DIMENSION>& a, Vector<T, DIMENSION>& b, Vect
     return true;
 }
 
-using Vec2 = Vector<float, 2>;
-using Vec3 = Vector<float, 3>;
-using Vec4 = Vector<float, 4>;
-
-using Color3 = Vector<float, 3>;
-using Color4 = Vector<float, 4>;
-
-using IVec2 = Vector<int, 2>;
-using IVec3 = Vector<int, 3>;
-using IVec4 = Vector<int, 4>;
-
-using UVec2 = Vector<unsigned int, 2>;
-using UVec3 = Vector<unsigned int, 3>;
-using UVec4 = Vector<unsigned int, 4>;
-
 template <typename T, unsigned int DIMENSION>
 inline real Vector<T, DIMENSION>::dot(Vector<T, DIMENSION> const& rhs) const
 {
@@ -648,13 +633,19 @@ inline Vector<T, DIMENSION> Vector<T, DIMENSION>::cross(Vector<T, DIMENSION> con
 template <typename T, unsigned int DIMENSION>
 inline Vector<T, DIMENSION> Vector<T, DIMENSION>::reflect(Vector<T, DIMENSION> const& rhs) const
 {
-    return Vector<T, DIMENSION>();
+    Vector<T, DIMENSION> proj_a_on_b = this->project(rhs);
+    return *this - (2 * proj_a_on_b);
 }
 
 template <typename T, unsigned int DIMENSION>
 inline Vector<T, DIMENSION> Vector<T, DIMENSION>::reject(Vector<T, DIMENSION> const& rhs) const
 {
-    return Vector<T, DIMENSION>();
+    /*
+     * Rejection of vector 'a' onto vector 'b' is the opposite of projection of vector 'a' onto vector 'b'.
+     * To find rejection of A onto B, subtract the projection of A onto B from vector 'a'.
+     */
+    Vector<T, DIMENSION> proj_a_on_b = this->project(rhs);
+    return *this - proj_a_on_b;
 }
 
 template <typename T, unsigned int DIMENSION>
@@ -666,7 +657,35 @@ inline Vector<T, DIMENSION> Vector<T, DIMENSION>::angle(Vector<T, DIMENSION> con
 template <typename T, unsigned int DIMENSION>
 inline Vector<T, DIMENSION> Vector<T, DIMENSION>::project(Vector<T, DIMENSION> const& rhs) const
 {
-    return Vector<T, DIMENSION>();
+    /*
+     * To calculate the projection of vector 'a' onto vector 'b', vector 'a' must be broken down
+     * into parallel and perpendicular components with respect to vector 'b'.
+     *  1. Projection: The parallel component, i.e., length of vector 'a' in the direction of vector 'b'.
+     *  2. Rejection: The perpendicular component, i.e., parallel component subtracted from vector 'a'.
+     */
+
+    real mag_b_sq = rhs.lengthSquare();
+    if(mag_b_sq < Constants::EPSILON)
+    {
+        return Vector<T, DIMENSION>{};
+    }
+
+    /*
+     * If vector 'b' is a unit vector, then length of vector 'a' in the direction of vector 'b' is
+     * given by a dot product between A and B. However, if neither input vector is normalized,
+     * the dot product needs to be divided by the length of vector 'b' (the vector being projected onto).
+     */
+    real scale = this->dot(rhs) / mag_b_sq;
+
+    /*
+     * Now that the parallel component of A with respect to B is known, vector 'b' can be scaled
+     * by this component. Again, if B wasn't of unit length, the result will need to be divided
+     * by the length of vector 'b' (the division by LengthSq(b) takes care of this).
+     *
+     * Basically, vector projection of vector 'a' on a non zero vector 'b' is given by [dot(a, unit(b)) * unit(b)].
+     * Checkout https://en.wikipedia.org/wiki/Vector_projection
+     */
+    return rhs * scale;
 }
 
 template <typename T, unsigned int DIMENSION>
@@ -729,6 +748,21 @@ inline Vector<T, DIMENSION> Vector<T, DIMENSION>::normalize() const
     // }
     return result;
 }
+
+using Vec2 = Vector<float, 2>;
+using Vec3 = Vector<float, 3>;
+using Vec4 = Vector<float, 4>;
+
+using Color3 = Vector<float, 3>;
+using Color4 = Vector<float, 4>;
+
+using IVec2 = Vector<int, 2>;
+using IVec3 = Vector<int, 3>;
+using IVec4 = Vector<int, 4>;
+
+using UVec2 = Vector<unsigned int, 2>;
+using UVec3 = Vector<unsigned int, 3>;
+using UVec4 = Vector<unsigned int, 4>;
 
 } // namespace ramanujan::experimental
 
