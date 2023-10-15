@@ -1,5 +1,5 @@
-#ifndef RAMANUJAN_VECTOR
-#define RAMANUJAN_VECTOR
+#ifndef RAMANUJAN_MATRIX
+#define RAMANUJAN_MATRIX
 
 #include "constants.h"
 #include "precision.h"
@@ -10,25 +10,27 @@ namespace ramanujan::experimental
 {
 
 template <typename T, std::size_t ROWS, std::size_t COLUMNS>
-class Matrix
+class TMatrix
 {
 public:
     using value_type      = T;
     using size_type       = std::size_t;
     using reference       = value_type&;
     using const_reference = const value_type&;
+    using pointer         = value_type*;
+    using const_pointer   = const value_type*;
 
-    constexpr Matrix() noexcept = default;
+    constexpr TMatrix() noexcept = default;
 
-    constexpr Matrix(const Matrix&) noexcept = default;
-    constexpr Matrix(Matrix&&) noexcept      = default;
+    constexpr TMatrix(const TMatrix&) noexcept = default;
+    constexpr TMatrix(TMatrix&&) noexcept      = default;
 
-    constexpr Matrix& operator=(const Matrix&) noexcept = default;
-    constexpr Matrix& operator=(Matrix&&) noexcept      = default;
+    constexpr TMatrix& operator=(const TMatrix&) noexcept = default;
+    constexpr TMatrix& operator=(TMatrix&&) noexcept      = default;
 
-    constexpr Matrix(const std::array<T, ROWS * COLUMNS>& data) noexcept : data_(data) {}
+    constexpr TMatrix(const std::array<T, ROWS * COLUMNS>& data) noexcept : data_(data) {}
 
-    constexpr Matrix(std::array<T, ROWS * COLUMNS>&& data) noexcept : data_(std::move(data)) {}
+    constexpr TMatrix(std::array<T, ROWS * COLUMNS>&& data) noexcept : data_(std::move(data)) {}
 
     constexpr reference operator()(size_type row, size_type column) noexcept { return data_[row * COLUMNS + column]; }
 
@@ -47,10 +49,23 @@ public:
 
     constexpr size_type size() const noexcept { return ROWS * COLUMNS; }
 
-    constexpr const T* data() const noexcept { return data_.data(); }
+    constexpr pointer data() const noexcept { return data_.data(); }
 
-    constexpr T* data() noexcept { return data_.data(); }
+    constexpr const_pointer data() noexcept { return data_.data(); }
 };
+
+template <typename T>
+struct TMatrix3 : public TMatrix<T, 3, 3>
+{
+};
+
+template <typename T>
+struct TMatrix4 : public TMatrix<T, 4, 4>
+{
+};
+
+using mat3 = TMatrix3<real>;
+using mat4 = TMatrix4<real>;
 
 } // namespace ramanujan::experimental
 
