@@ -1,23 +1,50 @@
-#pragma once
+#ifndef RAMANUJAN_PRECISION_H
+#define RAMANUJAN_PRECISION_H
 
 namespace ramanujan
 {
-
-#define SINGLE_FLOATING_POINT_PRECISION
-
-#ifdef SINGLE_FLOATING_POINT_PRECISION
 
 /*
  * Defines a real number precision. This provides us the flexibility to compile the library in single or a double
  * floating-point precision.
  */
+
+#define SINGLE_FLOATING_POINT_PRECISION
+
+#ifdef SINGLE_FLOATING_POINT_PRECISION
+
 using real = float;
 
+constexpr auto kPI       = 3.14159265358979323846f;
+constexpr auto kPI_2     = 1.57079632679489661923f;
+constexpr auto kPI_4     = 0.785398163397448309616f;
+constexpr auto kEpsilon  = 0.000001f;
+constexpr auto kRadToDeg = 57.2958f;
+constexpr auto kDegToRad = 0.0174533f;
+
 #define real_pow(x, y) powf(x, y)
+#define real_sqrt(x) sqrtf(x)
+#define real_acos(x) acosf(x)
+#define real_sin(x) sinf(x)
 
 #else
 
 using real = double;
+
+constexpr auto kPI       = 3.14159265358979323846;
+constexpr auto kPI_2     = 1.57079632679489661923;
+constexpr auto kPI_4     = 0.785398163397448309616;
+constexpr auto kEpsilon  = 0.000001;
+constexpr auto kRadToDeg = 57.2958;
+constexpr auto kDegToRad = 0.0174533;
+
+#define real_pow(x, y) pow(x, y)
+#define real_sqrt(x) sqrt(x)
+#define real_acos(x) acos(x)
+#define real_sin(x) sin(x)
+
 #endif
 
 } // namespace ramanujan
+
+#endif // ! RAMANUJAN_PRECISION_H
