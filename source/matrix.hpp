@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include "precision.h"
+#include "vector.hpp"
 
 #include <array>
 
@@ -20,28 +21,22 @@ public:
     using pointer         = value_type*;
     using const_pointer   = const value_type*;
 
-    constexpr TMatrix() noexcept = default;
-
-    constexpr TMatrix(const TMatrix&) noexcept = default;
-    constexpr TMatrix(TMatrix&&) noexcept      = default;
-
+    constexpr TMatrix() noexcept                          = default;
+    constexpr TMatrix(const TMatrix&) noexcept            = default;
+    constexpr TMatrix(TMatrix&&) noexcept                 = default;
     constexpr TMatrix& operator=(const TMatrix&) noexcept = default;
     constexpr TMatrix& operator=(TMatrix&&) noexcept      = default;
 
-    constexpr TMatrix(const std::array<T, ROWS * COLUMNS>& data) noexcept : data_(data) {}
-
-    constexpr TMatrix(std::array<T, ROWS * COLUMNS>&& data) noexcept : data_(std::move(data)) {}
-
-    constexpr reference operator()(size_type row, size_type column) noexcept { return data_[row * COLUMNS + column]; }
+    constexpr reference operator()(size_type row, size_type column) noexcept { return m_data[column * ROWS + row]; }
 
     constexpr const_reference operator()(size_type row, size_type column) const noexcept
     {
-        return data_[row * COLUMNS + column];
+        return m_data[column * ROWS + row];
     }
 
-    constexpr reference operator[](size_type index) noexcept { return data_[index]; }
+    // constexpr reference operator[](size_type index) noexcept { return data_[index]; }
 
-    constexpr const_reference operator[](size_type index) const noexcept { return data_[index]; }
+    // constexpr const_reference operator[](size_type index) const noexcept { return data_[index]; }
 
     constexpr size_type rows() const noexcept { return ROWS; }
 
@@ -52,6 +47,9 @@ public:
     constexpr pointer data() const noexcept { return data_.data(); }
 
     constexpr const_pointer data() noexcept { return data_.data(); }
+
+protected:
+    std::array<T, ROWS * COLUMNS> m_data;
 };
 
 template <typename T>

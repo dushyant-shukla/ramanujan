@@ -26,6 +26,20 @@ public:
     constexpr TVector& operator=(const TVector&) noexcept = default;
     constexpr TVector& operator=(TVector&&) noexcept      = default;
 
+    constexpr TVector(const T& value) noexcept { m_data.fill(value); }
+
+    template <typename... TArgs>
+    constexpr TVector(TArgs... args) noexcept
+    {
+        static_assert(N == sizeof...(args));
+        int j = 0;
+        for(auto value : std::initializer_list<std::common_type_t<TArgs...>>{args...})
+        {
+            m_data[j] = value;
+            ++j;
+        }
+    }
+
     template <std::size_t D = N>
     typename std::enable_if<D >= 4, TVector<T, 3>>::type xyz() const noexcept
     {
@@ -277,7 +291,7 @@ public:
      * @param t The amount to lerp by
      * @return A linearly interpolated vector
      */
-    friend constexpr TVector lerp(TVector start, TVector end, real t) noexcept
+    [[nodiscard]] friend constexpr TVector lerp(TVector start, TVector end, real t) noexcept
     {
         TVector result;
         for(size_type i = 0; i < N; ++i)
@@ -301,7 +315,7 @@ public:
      * @param t The amount to lerp by
      * @return A sphericaly interpolated vector
      */
-    friend constexpr TVector slerp(TVector start, TVector end, real t) noexcept
+    [[nodiscard]] friend constexpr TVector slerp(TVector start, TVector end, real t) noexcept
     {
 #ifdef COPILOT_GENERATED
 
@@ -343,12 +357,12 @@ public:
         return a * from + b * to;
     }
 
-    friend constexpr TVector nlerp(TVector start, TVector end, real t) noexcept
+    [[nodiscard]] friend constexpr TVector nlerp(TVector start, TVector end, real t) noexcept
     {
         return lerp(start, end, t).normalized();
     }
 
-    friend constexpr real angle(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend constexpr real angle(const TVector& a, const TVector& b) noexcept
     {
         real sq_mag_a = a.lengthSquared();
         real sq_mag_b = b.lengthSquared();
@@ -359,7 +373,7 @@ public:
         return real_acos(a.dot(b) / (a.length() * b.length()));
     }
 
-    friend constexpr TVector projection(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend constexpr TVector projection(const TVector& a, const TVector& b) noexcept
     {
         real sq_mag_b = b.lengthSquared();
         if(sq_mag_b < kEpsilon)
@@ -374,7 +388,7 @@ public:
         return b * (a.dot(b) / sq_mag_b);
     }
 
-    friend constexpr TVector rejection(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend constexpr TVector rejection(const TVector& a, const TVector& b) noexcept
     {
         /*
          * Rejection of vector 'a' onto vector 'b' is the opposite of projection of vector 'a' onto vector 'b'.
@@ -383,12 +397,12 @@ public:
         return a - projection(a, b);
     }
 
-    friend constexpr TVector reflection(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend constexpr TVector reflection(const TVector& a, const TVector& b) noexcept
     {
         return a - (2.0f * projection(a, b));
     }
 
-    friend constexpr bool orthonormalize(TVector& a, TVector& b, TVector& c) noexcept
+    [[nodiscard]] friend constexpr bool orthonormalize(TVector& a, TVector& b, TVector& c) noexcept
     {
 #ifdef COPILOT_GENERATED
         a.normalize();
@@ -433,64 +447,81 @@ public:
         return true;
     }
 
-private:
+    friend constexpr std::ostream& operator<<(std::ostream& stream, const TVector& vector)
+    {
+        stream << "[";
+        for(size_type i = 0; i < N; ++i)
+        {
+            stream << vector.m_data[i];
+            if(i < N - 1)
+            {
+                stream << ", ";
+            }
+        }
+        stream << "]";
+        return stream;
+    }
+
+protected:
     std::array<T, N> m_data;
 };
 
 template <typename T>
 struct TVec2 : public TVector<T, 2>
 {
-    T x;
-    T y;
+    T& x = TVector<T, 3>::m_data[0];
+    T& y = TVector<T, 3>::m_data[1];
 
-    TVec2(const T& v) noexcept : x(v), y(v) {}
-    TVec2(const T& _x, const T& _y) noexcept : x(_x), y(_y) {}
+    TVec2(const T& v) noexcept : TVector<T, 2>(v) {}
+    TVec2(const T& _x, const T& _y) noexcept : TVector<T, 2>(_x, _y) {}
 };
 
 template <typename T>
 struct TVec3 : public TVector<T, 3>
 {
-    T x;
-    T y;
-    T z;
+    T& x = TVector<T, 3>::m_data[0];
+    T& y = TVector<T, 3>::m_data[1];
+    T& z = TVector<T, 3>::m_data[2];
 
-    TVec3(const T& v) noexcept : x(v), y(v), z(v) {}
-    TVec3(const T& _x, const T& _y, const T& _z) noexcept : x(_x), y(_y), z(_z) {}
+    TVec3(const T& v) noexcept : TVector<T, 3>(v) {}
+    TVec3(const T& _x, const T& _y, const T& _z) noexcept : TVector<T, 3>(_x, _y, _z) {}
 };
 
 template <typename T>
 struct TVec4 : public TVector<T, 4>
 {
-    T x;
-    T y;
-    T z;
-    T w;
+    T& x = TVector<T, 4>::m_data[0];
+    T& y = TVector<T, 4>::m_data[1];
+    T& z = TVector<T, 4>::m_data[2];
+    T& w = TVector<T, 4>::m_data[3];
 
-    TVec4(const T& v) noexcept : x(v), y(v), z(v), w(v) {}
-    TVec4(const T& _x, const T& _y, const T& _z, const T& _w) noexcept : x(_x), y(_y), z(_z), w(_w) {}
+    TVec4(const T& v) noexcept : TVector<T, 4>(v) {}
+    TVec4(const T& _x, const T& _y, const T& _z, const T& _w) noexcept : TVector<T, 4>(_x, _y, _z, _w) {}
 };
 
 struct color3 : public TVector<float, 3>
 {
-    float r;
-    float g;
-    float b;
+    float& r = TVector<float, 3>::m_data[0];
+    float& g = TVector<float, 3>::m_data[1];
+    float& b = TVector<float, 3>::m_data[2];
 
-    color3(const float& v) noexcept : r(v), g(v), b(v) {}
-    color3(const float& _r, const float& _g, const float& _b) noexcept : r(_r), g(_g), b(_b) {}
-    color3(const float& _r, const float& _g, const float& _b, const float& _a) noexcept : r(_r), g(_g), b(_b) {}
+    color3(const float& v) noexcept : TVector<float, 3>(v) {}
+    color3(const float& _r, const float& _g, const float& _b) noexcept : TVector<float, 3>(_r, _g, _b) {}
 };
 
 struct color4 : public TVector<float, 4>
 {
-    float r;
-    float g;
-    float b;
-    float a;
+    float& r = TVector<float, 4>::m_data[0];
+    float& g = TVector<float, 4>::m_data[1];
+    float& b = TVector<float, 4>::m_data[2];
+    float& a = TVector<float, 4>::m_data[3];
 
-    color4(const float& v) noexcept : r(v), g(v), b(v), a(1.0f) {}
-    color4(const float& _r, const float& _g, const float& _b) noexcept : r(_r), g(_g), b(_b), a(1.0f) {}
-    color4(const float& _r, const float& _g, const float& _b, const float& _a) noexcept : r(_r), g(_g), b(_b), a(_a) {}
+    color4(const float& v) noexcept : TVector<float, 4>(v) { TVector<float, 4>::m_data[3] = 1.0f; }
+    color4(const float& _r, const float& _g, const float& _b) noexcept : TVector<float, 4>(_r, _g, _b, 1.0f) {}
+    color4(const float& _r, const float& _g, const float& _b, const float& _a) noexcept
+        : TVector<float, 4>(_r, _g, _b, _a)
+    {
+    }
 };
 
 using vec2 = TVec2<real>;
