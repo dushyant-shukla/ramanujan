@@ -9,7 +9,7 @@
 namespace ramanujan::experimental
 {
 
-template <typename T, std::size_t N>
+template <typename TYPE, typename T, std::size_t N>
 class TVector
 {
 public:
@@ -20,16 +20,14 @@ public:
     using pointer         = value_type*;
     using const_pointer   = const value_type*;
 
-    constexpr TVector() noexcept                          = default;
-    constexpr TVector(const TVector&) noexcept            = default;
-    constexpr TVector(TVector&&) noexcept                 = default;
-    constexpr TVector& operator=(const TVector&) noexcept = default;
-    constexpr TVector& operator=(TVector&&) noexcept      = default;
+    TVector() noexcept               = default;
+    TVector(const TVector&) noexcept = default;
+    TVector(TVector&&) noexcept      = default;
 
-    constexpr TVector(const T& value) noexcept { m_data.fill(value); }
+    TVector(const T& value) noexcept { m_data.fill(value); }
 
     template <typename... TArgs>
-    constexpr TVector(TArgs... args) noexcept
+    TVector(TArgs... args) noexcept
     {
         static_assert(N == sizeof...(args));
         int j = 0;
@@ -40,216 +38,237 @@ public:
         }
     }
 
+    TVector& operator=(const TVector& rhs) noexcept
+    {
+        if(this != &rhs)
+        {
+            m_data = rhs.m_data;
+        }
+        return **static_cast<TYPE*>(this);
+    }
+
+    TVector& operator=(TVector&& rhs) noexcept
+    {
+        if(this != &rhs)
+        {
+            m_data = rhs.m_data;
+        }
+        return *static_cast<TYPE*>(this);
+    }
+
     template <std::size_t D = N>
-    typename std::enable_if<D >= 4, TVector<T, 3>>::type xyz() const noexcept
+    typename std::enable_if<D >= 4, TVector<TYPE, T, 3>>::type xyz() const noexcept
     {
         return {m_data[0], m_data[1], m_data[2]};
     }
 
     template <std::size_t D = N>
-    typename std::enable_if_t<D >= 3, TVector<T, 2>>::type xy() const noexcept
+    typename std::enable_if_t<D >= 3, TVector<TYPE, T, 2>>::type xy() const noexcept
     {
         return {m_data[0], m_data[1]};
     }
 
     template <std::size_t D = N>
-    typename std::enable_if_t<D >= 3, TVector<T, 2>>::type yz() const noexcept
+    typename std::enable_if_t<D >= 3, TVector<TYPE, T, 2>>::type yz() const noexcept
     {
         return {m_data[1], m_data[2]};
     }
 
     template <std::size_t D = N>
-    typename std::enable_if_t<D >= 3, TVector<T, 2>>::type xz() const noexcept
+    typename std::enable_if_t<D >= 3, TVector<TYPE, T, 2>>::type xz() const noexcept
     {
         return {m_data[0], m_data[2]};
     }
 
-    constexpr reference operator[](size_type index) noexcept { return m_data[index]; }
+    reference operator[](size_type index) noexcept { return m_data[index]; }
 
-    constexpr const_reference operator[](size_type index) const noexcept { return m_data[index]; }
+    const_reference operator[](size_type index) const noexcept { return m_data[index]; }
 
-    constexpr reference at(size_type index) noexcept { return m_data.at(index); }
+    reference at(size_type index) noexcept { return m_data.at(index); }
 
-    constexpr const_reference at(size_type index) const noexcept { return m_data.at(index); }
+    const_reference at(size_type index) const noexcept { return m_data.at(index); }
 
-    constexpr pointer data() noexcept { return m_data.data(); }
+    pointer data() noexcept { return m_data.data(); }
 
-    constexpr const_pointer data() const noexcept { return m_data.data(); }
+    const_pointer data() const noexcept { return m_data.data(); }
 
-    constexpr size_type size() const noexcept { return m_data.size(); }
+    size_type size() const noexcept { return m_data.size(); }
 
-    constexpr bool empty() const noexcept { return m_data.empty(); }
+    bool empty() const noexcept { return m_data.empty(); }
 
-    constexpr void fill(const T& value) noexcept { m_data.fill(value); }
+    void fill(const T& value) noexcept { m_data.fill(value); }
 
-    constexpr void swap(TVector& other) noexcept { m_data.swap(other.m_data); }
+    void swap(TVector& other) noexcept { m_data.swap(other.m_data); }
 
-    constexpr TVector& operator+=(const TVector& rhs) noexcept
+    void clear() noexcept { m_data.fill(0.0f); }
+
+    TVector& operator+=(const TVector& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] += rhs.m_data[i];
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator-=(const TVector& rhs) noexcept
+    TVector& operator-=(const TVector& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] -= rhs.m_data[i];
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator*=(const TVector& rhs) noexcept
+    TVector& operator*=(const TVector& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] *= rhs.m_data[i];
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator/=(const TVector& rhs) noexcept
+    TVector& operator/=(const TVector& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] /= rhs.m_data[i];
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator+=(const T& rhs) noexcept
+    TVector& operator+=(const T& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] += rhs;
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator-=(const T& rhs) noexcept
+    TVector& operator-=(const T& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] -= rhs;
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator*=(const T& rhs) noexcept
+    TVector& operator*=(const T& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] *= rhs;
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector& operator/=(const T& rhs) noexcept
+    TVector& operator/=(const T& rhs) noexcept
     {
         for(size_type i = 0; i < N; ++i)
         {
             m_data[i] /= rhs;
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector operator+(const TVector& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator+(const TYPE& lhs, const TYPE& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result += rhs;
         return result;
     }
 
-    constexpr TVector operator-(const TVector& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator-(const TYPE& lhs, const TYPE& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result -= rhs;
         return result;
     }
 
-    constexpr TVector operator*(const TVector& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator*(const TYPE& lhs, const TYPE& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result *= rhs;
         return result;
     }
 
-    constexpr TVector operator/(const TVector& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator/(const TYPE& lhs, const TYPE& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result /= rhs;
         return result;
     }
 
-    constexpr TVector operator+(const T& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator+(const TYPE& lhs, const T& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result += rhs;
         return result;
     }
 
-    constexpr TVector operator-(const T& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator-(const TYPE& lhs, const T& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result -= rhs;
         return result;
     }
 
-    constexpr TVector operator*(const T& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator*(const TYPE& lhs, const T& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result *= rhs;
         return result;
     }
 
-    constexpr TVector operator/(const T& rhs) const noexcept
+    [[nodiscard]] friend TYPE operator/(const TYPE& lhs, const T& rhs) noexcept
     {
-        TVector result(*this);
+        TYPE result = lhs;
         result /= rhs;
         return result;
     }
 
-    constexpr bool operator==(const TVector& rhs) const noexcept { return m_data == rhs.m_data; }
+    [[nodiscard]] bool operator==(const TVector& rhs) const noexcept { return m_data == rhs.m_data; }
 
-    constexpr bool operator!=(const TVector& rhs) const noexcept { return m_data != rhs.m_data; }
+    [[nodiscard]] bool operator!=(const TVector& rhs) const noexcept { return m_data != rhs.m_data; }
 
-    constexpr bool operator<(const TVector& rhs) const noexcept { return m_data < rhs.m_data; }
+    [[nodiscard]] bool operator<(const TVector& rhs) const noexcept { return m_data < rhs.m_data; }
 
-    constexpr bool operator<=(const TVector& rhs) const noexcept { return m_data <= rhs.m_data; }
+    [[nodiscard]] bool operator<=(const TVector& rhs) const noexcept { return m_data <= rhs.m_data; }
 
-    constexpr bool operator>(const TVector& rhs) const noexcept { return m_data > rhs.m_data; }
+    [[nodiscard]] bool operator>(const TVector& rhs) const noexcept { return m_data > rhs.m_data; }
 
-    constexpr bool operator>=(const TVector& rhs) const noexcept { return m_data >= rhs.m_data; }
+    [[nodiscard]] bool operator>=(const TVector& rhs) const noexcept { return m_data >= rhs.m_data; }
 
-    constexpr TVector& normalize() noexcept
+    TVector& normalize() noexcept
     {
-        T length = length();
-        if(length > 0.0f)
+        T len = length();
+        if(len > 0.0f)
         {
-            *this /= length;
+            *this /= len;
         }
-        return *this;
+        return *static_cast<TYPE*>(this);
     }
 
-    constexpr TVector normalized() const noexcept
+    [[nodiscard]] TYPE normalized() const noexcept
     {
-        TVector result(*this);
+        TYPE result{};
+        result.m_data = m_data;
         result.normalize();
         return result;
     }
 
-    constexpr real length() const noexcept { return real_sqrt(lengthSquared()); }
+    [[nodiscard]] real length() const noexcept { return real_sqrt(lengthSquared()); }
 
-    constexpr real lengthSquared() const noexcept { return *this.dot(*this); }
+    [[nodiscard]] real lengthSquared() const noexcept { return dot(*this); }
 
-    constexpr real distance(const TVector& rhs) const noexcept { return (*this - rhs).length(); }
+    [[nodiscard]] real distance(const TVector& rhs) const noexcept { return (*this - rhs).length(); }
 
-    constexpr real distanceSquared(const TVector& rhs) const noexcept { return (*this - rhs).lengthSquared(); }
+    [[nodiscard]] real distanceSquared(const TVector& rhs) const noexcept { return (*this - rhs).lengthSquared(); }
 
-    constexpr T dot(const TVector& rhs) const noexcept
+    [[nodiscard]] T dot(const TVector& rhs) const noexcept
     {
         T result = 0.0f;
         for(size_type i = 0; i < N; ++i)
@@ -260,20 +279,20 @@ public:
     }
 
     template <std::size_t D = N>
-    constexpr typename std::enable_if_t<D == 3, TVector<T, 3>> cross(const TVector& rhs) const noexcept
+    [[nodiscard]] typename std::enable_if_t<D == 3, TYPE> cross(const TVector& rhs) const noexcept
     {
-        TVector result;
+        TYPE result;
         result[0] = m_data[1] * rhs.m_data[2] - m_data[2] * rhs.m_data[1];
         result[1] = m_data[2] * rhs.m_data[0] - m_data[0] * rhs.m_data[2];
         result[2] = m_data[0] * rhs.m_data[1] - m_data[1] * rhs.m_data[0];
         return result;
     }
 
-    constexpr bool isZero() const noexcept { return *this.lengthSquared() < kEpsilon; }
+    [[nodiscard]] bool isZero() const noexcept { return lengthSquared() < kEpsilon; }
 
-    constexpr bool isParallel(const TVector& b) const noexcept { return *this.cross(b).lengthSquared() < kEpsilon; }
+    [[nodiscard]] bool isParallel(const TYPE& b) const noexcept { return cross(b).lengthSquared() < kEpsilon; }
 
-    constexpr bool isOrthogonal(const TVector& b) const noexcept { return *this.dot(b) < kEpsilon; }
+    [[nodiscard]] bool isOrthogonal(const TYPE& b) const noexcept { return dot(b) < kEpsilon; }
 
     /*!
      * @brief Linear interpolation can be calculated by scaling the difference between the two vectors,
@@ -291,9 +310,9 @@ public:
      * @param t The amount to lerp by
      * @return A linearly interpolated vector
      */
-    [[nodiscard]] friend constexpr TVector lerp(TVector start, TVector end, real t) noexcept
+    [[nodiscard]] friend TYPE lerp(TYPE start, TYPE end, real t) noexcept
     {
-        TVector result;
+        TYPE result;
         for(size_type i = 0; i < N; ++i)
         {
             result[i] = start[i] + t * (end[i] - start[i]);
@@ -315,7 +334,7 @@ public:
      * @param t The amount to lerp by
      * @return A sphericaly interpolated vector
      */
-    [[nodiscard]] friend constexpr TVector slerp(TVector start, TVector end, real t) noexcept
+    [[nodiscard]] friend TYPE slerp(TYPE start, TYPE end, real t) noexcept
     {
 #ifdef COPILOT_GENERATED
 
@@ -346,8 +365,8 @@ public:
             return lerp(start, end, t);
         }
 
-        TVector from = start.normalized();
-        TVector to   = end.normalized();
+        TYPE from = start.normalized();
+        TYPE to   = end.normalized();
 
         real theta     = angle(from, to);
         real sin_theta = real_sin(theta);
@@ -357,12 +376,9 @@ public:
         return a * from + b * to;
     }
 
-    [[nodiscard]] friend constexpr TVector nlerp(TVector start, TVector end, real t) noexcept
-    {
-        return lerp(start, end, t).normalized();
-    }
+    [[nodiscard]] friend TYPE nlerp(TYPE start, TYPE end, real t) noexcept { return lerp(start, end, t).normalized(); }
 
-    [[nodiscard]] friend constexpr real angle(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend real angle(const TYPE& a, const TYPE& b) noexcept
     {
         real sq_mag_a = a.lengthSquared();
         real sq_mag_b = b.lengthSquared();
@@ -373,12 +389,12 @@ public:
         return real_acos(a.dot(b) / (a.length() * b.length()));
     }
 
-    [[nodiscard]] friend constexpr TVector projection(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend TYPE projection(const TYPE& a, const TYPE& b) noexcept
     {
         real sq_mag_b = b.lengthSquared();
         if(sq_mag_b < kEpsilon)
         {
-            return TVector(0.0f);
+            return TYPE(0.0f);
         }
 
         /*
@@ -388,7 +404,7 @@ public:
         return b * (a.dot(b) / sq_mag_b);
     }
 
-    [[nodiscard]] friend constexpr TVector rejection(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend TYPE rejection(const TYPE& a, const TYPE& b) noexcept
     {
         /*
          * Rejection of vector 'a' onto vector 'b' is the opposite of projection of vector 'a' onto vector 'b'.
@@ -397,12 +413,12 @@ public:
         return a - projection(a, b);
     }
 
-    [[nodiscard]] friend constexpr TVector reflection(const TVector& a, const TVector& b) noexcept
+    [[nodiscard]] friend TYPE reflection(const TYPE& a, const TYPE& b) noexcept
     {
         return a - (2.0f * projection(a, b));
     }
 
-    [[nodiscard]] friend constexpr bool orthonormalize(TVector& a, TVector& b, TVector& c) noexcept
+    [[nodiscard]] friend bool orthonormalize(TYPE& a, TYPE& b, TYPE& c) noexcept
     {
 #ifdef COPILOT_GENERATED
         a.normalize();
@@ -447,7 +463,7 @@ public:
         return true;
     }
 
-    friend constexpr std::ostream& operator<<(std::ostream& stream, const TVector& vector)
+    friend std::ostream& operator<<(std::ostream& stream, const TVector& vector)
     {
         stream << "[";
         for(size_type i = 0; i < N; ++i)
@@ -466,79 +482,127 @@ protected:
     std::array<T, N> m_data;
 };
 
-template <typename T>
-struct TVec2 : public TVector<T, 2>
+struct vec2 : public TVector<vec2, real, 2>
 {
-    T& x = TVector<T, 3>::m_data[0];
-    T& y = TVector<T, 3>::m_data[1];
+    real& x = TVector<vec2, real, 2>::m_data[0];
+    real& y = TVector<vec2, real, 2>::m_data[1];
 
-    TVec2(const T& v) noexcept : TVector<T, 2>(v) {}
-    TVec2(const T& _x, const T& _y) noexcept : TVector<T, 2>(_x, _y) {}
-};
+    vec2() noexcept            = default;
+    vec2(const vec2&) noexcept = default;
+    vec2(vec2&&) noexcept      = default;
+    vec2(const real& v) noexcept : TVector<vec2, real, 2>(v) {}
+    vec2(const real& _x, const real& _y) noexcept : TVector<vec2, real, 2>(_x, _y) {}
 
-template <typename T>
-struct TVec3 : public TVector<T, 3>
-{
-    T& x = TVector<T, 3>::m_data[0];
-    T& y = TVector<T, 3>::m_data[1];
-    T& z = TVector<T, 3>::m_data[2];
-
-    TVec3(const T& v) noexcept : TVector<T, 3>(v) {}
-    TVec3(const T& _x, const T& _y, const T& _z) noexcept : TVector<T, 3>(_x, _y, _z) {}
-};
-
-template <typename T>
-struct TVec4 : public TVector<T, 4>
-{
-    T& x = TVector<T, 4>::m_data[0];
-    T& y = TVector<T, 4>::m_data[1];
-    T& z = TVector<T, 4>::m_data[2];
-    T& w = TVector<T, 4>::m_data[3];
-
-    TVec4(const T& v) noexcept : TVector<T, 4>(v) {}
-    TVec4(const T& _x, const T& _y, const T& _z, const T& _w) noexcept : TVector<T, 4>(_x, _y, _z, _w) {}
-};
-
-struct color3 : public TVector<float, 3>
-{
-    float& r = TVector<float, 3>::m_data[0];
-    float& g = TVector<float, 3>::m_data[1];
-    float& b = TVector<float, 3>::m_data[2];
-
-    color3(const float& v) noexcept : TVector<float, 3>(v) {}
-    color3(const float& _r, const float& _g, const float& _b) noexcept : TVector<float, 3>(_r, _g, _b) {}
-};
-
-struct color4 : public TVector<float, 4>
-{
-    float& r = TVector<float, 4>::m_data[0];
-    float& g = TVector<float, 4>::m_data[1];
-    float& b = TVector<float, 4>::m_data[2];
-    float& a = TVector<float, 4>::m_data[3];
-
-    color4(const float& v) noexcept : TVector<float, 4>(v) { TVector<float, 4>::m_data[3] = 1.0f; }
-    color4(const float& _r, const float& _g, const float& _b) noexcept : TVector<float, 4>(_r, _g, _b, 1.0f) {}
-    color4(const float& _r, const float& _g, const float& _b, const float& _a) noexcept
-        : TVector<float, 4>(_r, _g, _b, _a)
+    vec2& operator=(const vec2& rhs) noexcept
     {
+        if(*this != rhs)
+        {
+            x = rhs.x;
+            y = rhs.y;
+        }
+        return *this;
+    }
+
+    vec2& operator=(vec2&& rhs) noexcept
+    {
+        if(*this != rhs)
+        {
+            x = rhs.x;
+            y = rhs.y;
+        }
+        return *this;
     }
 };
 
-using vec2 = TVec2<real>;
-using vec3 = TVec3<real>;
-using vec4 = TVec4<real>;
+struct vec3 : public TVector<vec3, real, 3>
+{
+    real& x = TVector<vec3, real, 3>::m_data[0];
+    real& y = TVector<vec3, real, 3>::m_data[1];
+    real& z = TVector<vec3, real, 3>::m_data[2];
 
-using ivec2 = TVec2<int>;
-using ivec3 = TVec3<int>;
-using ivec4 = TVec4<int>;
+    vec3() noexcept            = default;
+    vec3(const vec3&) noexcept = default;
+    vec3(vec3&&) noexcept      = default;
+    vec3(const real& v) noexcept : TVector<vec3, real, 3>(v) {}
+    vec3(const real& _x, const real& _y, const real& _z) noexcept : TVector<vec3, real, 3>(_x, _y, _z) {}
 
-using uvec2 = TVec2<unsigned>;
-using uvec3 = TVec3<unsigned>;
-using uvec4 = TVec4<unsigned>;
+    vec3& operator=(const vec3& rhs) noexcept
+    {
+        if(*this != rhs)
+        {
+            x = rhs.x;
+            y = rhs.y;
+            z = rhs.z;
+        }
+        return *this;
+    }
 
-using bvec2 = TVec2<bool>;
-using bvec3 = TVec3<bool>;
-using bvec4 = TVec4<bool>;
+    vec3& operator=(vec3&& rhs) noexcept
+    {
+        if(*this != rhs)
+        {
+            x = rhs.x;
+            y = rhs.y;
+            z = rhs.z;
+        }
+        return *this;
+    }
+
+    [[nodiscard]] vec2 xy() const noexcept { return {x, y}; }
+
+    [[nodiscard]] vec2 yz() const noexcept { return {y, z}; }
+
+    [[nodiscard]] vec2 xz() const noexcept { return {x, z}; }
+};
+
+struct vec4 : public TVector<vec4, real, 4>
+{
+    real& x = TVector<vec4, real, 4>::m_data[0];
+    real& y = TVector<vec4, real, 4>::m_data[1];
+    real& z = TVector<vec4, real, 4>::m_data[2];
+    real& w = TVector<vec4, real, 4>::m_data[3];
+
+    vec4() noexcept            = default;
+    vec4(const vec4&) noexcept = default;
+    vec4(vec4&&) noexcept      = default;
+    vec4(const real& v) noexcept : TVector<vec4, real, 4>(v) {}
+    vec4(const real& _x, const real& _y, const real& _z, const real& _w) noexcept
+        : TVector<vec4, real, 4>(_x, _y, _z, _w)
+    {
+    }
+
+    vec4& operator=(const vec4& rhs) noexcept
+    {
+        if(*this != rhs)
+        {
+            x = rhs.x;
+            y = rhs.y;
+            z = rhs.z;
+            w = rhs.w;
+        }
+        return *this;
+    }
+
+    vec4& operator=(vec4&& rhs) noexcept
+    {
+        if(*this != rhs)
+        {
+            x = rhs.x;
+            y = rhs.y;
+            z = rhs.z;
+            w = rhs.w;
+        }
+        return *this;
+    }
+
+    [[nodiscard]] vec3 xyz() const noexcept { return {x, y, z}; }
+
+    [[nodiscard]] vec2 xy() const noexcept { return {x, y}; }
+
+    [[nodiscard]] vec2 yz() const noexcept { return {y, z}; }
+
+    [[nodiscard]] vec2 xz() const noexcept { return {x, z}; }
+};
 
 } // namespace ramanujan::experimental
 

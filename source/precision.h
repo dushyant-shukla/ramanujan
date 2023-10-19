@@ -1,6 +1,8 @@
 #ifndef RAMANUJAN_PRECISION_H
 #define RAMANUJAN_PRECISION_H
 
+#include <float.h>
+
 namespace ramanujan
 {
 
@@ -21,6 +23,7 @@ constexpr auto kPI_4     = 0.785398163397448309616f;
 constexpr auto kEpsilon  = 0.000001f;
 constexpr auto kRadToDeg = 57.2958f;
 constexpr auto kDegToRad = 0.0174533f;
+constexpr auto kRealMax  = FLT_MAX;
 
 #define real_pow(x, y) powf(x, y)
 #define real_sqrt(x) sqrtf(x)
@@ -37,6 +40,7 @@ constexpr auto kPI_4     = 0.785398163397448309616;
 constexpr auto kEpsilon  = 0.000001;
 constexpr auto kRadToDeg = 57.2958;
 constexpr auto kDegToRad = 0.0174533;
+constexpr auto kRealMax  = DBL_MAX;
 
 #define real_pow(x, y) pow(x, y)
 #define real_sqrt(x) sqrt(x)
