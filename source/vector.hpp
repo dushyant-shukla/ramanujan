@@ -195,6 +195,47 @@ public:
         return result;
     }
 
+    [[nodiscard]] friend VEC_TYPE operator+(const T& scalar, const VEC_TYPE& rhs) noexcept
+    {
+        VEC_TYPE result{};
+        for(size_type i = 0; i < N; ++i)
+        {
+            result.data[i] = rhs.data[i] + scalar;
+        }
+        return result;
+    }
+
+    [[nodiscard]] friend VEC_TYPE operator-(const T& scalar, const VEC_TYPE& rhs) noexcept
+    {
+        VEC_TYPE result{};
+        for(size_type i = 0; i < N; ++i)
+        {
+            result.data[i] = rhs.data[i] - scalar;
+        }
+        return result;
+    }
+
+    [[nodiscard]] friend VEC_TYPE operator*(const T& scalar, const VEC_TYPE& rhs) noexcept
+    {
+        VEC_TYPE result{};
+        for(size_type i = 0; i < N; ++i)
+        {
+            result.data[i] = rhs.data[i] * scalar;
+        }
+        return result;
+    }
+
+    [[nodiscard]] friend VEC_TYPE operator/(const T& scalar, const VEC_TYPE& rhs) noexcept
+    {
+        assert(scalar > T(0));
+        VEC_TYPE result{};
+        for(size_type i = 0; i < N; ++i)
+        {
+            result.data[i] = rhs.data[i] / scalar;
+        }
+        return result;
+    }
+
     reference operator[](size_type i) noexcept
     {
         assert(i < N);
@@ -268,7 +309,7 @@ public:
     [[nodiscard]] VEC_TYPE normalized() const noexcept
     {
         VEC_TYPE result{};
-        result.data = data;
+        result.data = type().data;
         result.normalize();
         return result;
     }
@@ -285,13 +326,13 @@ public:
     }
 
     template <size_type D = N>
-    [[nodiscard]] typename std::enable_if_t<D == 3, VEC_TYPE> cross(const TVector& rhs) const noexcept
+    [[nodiscard]] typename std::enable_if_t<D == 3, VEC_TYPE> cross(const VEC_TYPE& rhs) const noexcept
     {
         auto&    self = type();
         VEC_TYPE result{};
-        result[0] = self.data[1] * rhs.m_data[2] - self.data[2] * rhs.m_data[1];
-        result[1] = self.data[2] * rhs.m_data[0] - self.data[0] * rhs.m_data[2];
-        result[2] = self.data[0] * rhs.m_data[1] - self.data[1] * rhs.m_data[0];
+        result[0] = self.data[1] * rhs.data[2] - self.data[2] * rhs.data[1];
+        result[1] = self.data[2] * rhs.data[0] - self.data[0] * rhs.data[2];
+        result[2] = self.data[0] * rhs.data[1] - self.data[1] * rhs.data[0];
         return result;
     }
 
@@ -303,6 +344,180 @@ public:
     }
 
     [[nodiscard]] bool isOrthogonal(const VEC_TYPE& b) const noexcept { return type().dot(b) < kEpsilon; }
+
+    /*!
+     * @brief Linear interpolation can be calculated by scaling the difference between the two vectors,
+     * and adding the result back to the original vector.
+     *
+     * The amount to lerp by is a normalized value (t) between 0 and 1. When t = 0, the interpolated
+     * vector is the same as the starting vector. When t = 1, the interpolated vector is the same as
+     * the end vector.
+     *
+     * Linearly interpolating between two vectors will always take the shortest path from one vector
+     * to another.
+     *
+     * @param start The start vector
+     * @param end The end vector
+     * @param t The amount to lerp by
+     * @return A linearly interpolated vector
+     */
+    [[nodiscard]] friend VEC_TYPE lerp(VEC_TYPE start, VEC_TYPE end, real t) noexcept
+    {
+        VEC_TYPE result{};
+        for(size_type i = 0; i < N; ++i)
+        {
+            result[i] = start[i] + t * (end[i] - start[i]);
+        }
+        return result;
+    }
+
+    /*!
+     * @brief Sometimes, the shortest path obtained between by linearly interpolating between two vectors
+     * isn't the best path. Sometimes, we may want to interpolate between two vectors along the
+     * shortest arc, i.e., Spherical Linear Interpolation (slerp).
+     *
+     * Assuming, theta is the angle between the two vectors, the formula for slerp is given by:
+     *
+     * slerp(start, end, t) = [sin((1-t)theta) / sin(theta) * start] + [sin((t)theta) / sin(theta) * end]
+     *
+     * @param start The start vector
+     * @param end The end vector
+     * @param t The amount to lerp by
+     * @return A sphericaly interpolated vector
+     */
+    [[nodiscard]] friend VEC_TYPE slerp(VEC_TYPE start, VEC_TYPE end, real t) noexcept
+    {
+#ifdef COPILOT_GENERATED
+
+        TVector result;
+        real    dot = start.dot(end);
+        if(dot < 0.0f)
+        {
+            end = -end;
+            dot = -dot;
+        }
+        if(dot > 0.9995f)
+        {
+            return lerp(start, end, t);
+        }
+        real    theta           = acosf(dot) * t;
+        TVector relative_vector = end - start * dot;
+        relative_vector.normalize();
+        return start * cosf(theta) + relative_vector * sinf(theta);
+
+#endif
+
+        /*
+         * When the value of t is close to 0, slerp will yield unexpected results.
+         * Therefore, we fall back to lerp or normalized lerp(nlerp).
+         */
+        if(t < 0.01f)
+        {
+            return lerp(start, end, t);
+        }
+
+        VEC_TYPE from = start.normalized();
+        VEC_TYPE to   = end.normalized();
+
+        real theta     = angle(from, to);
+        real sin_theta = real_sin(theta);
+
+        real a = real_sin((1.0f - t) * theta) / sin_theta;
+        real b = real_sin(t * theta) / sin_theta;
+        return a * from + b * to;
+    }
+
+    [[nodiscard]] friend VEC_TYPE nlerp(VEC_TYPE start, VEC_TYPE end, real t) noexcept
+    {
+        return lerp(start, end, t).normalized();
+    }
+
+    [[nodiscard]] friend real angle(const VEC_TYPE& a, const VEC_TYPE& b) noexcept
+    {
+        real sq_mag_a = a.lengthSquared();
+        real sq_mag_b = b.lengthSquared();
+        if(sq_mag_a < kEpsilon || sq_mag_b < kEpsilon)
+        {
+            return 0.0f;
+        }
+        return real_acos(a.dot(b) / (a.length() * b.length()));
+    }
+
+    [[nodiscard]] friend VEC_TYPE projection(const VEC_TYPE& a, const VEC_TYPE& b) noexcept
+    {
+        real sq_mag_b = b.lengthSquared();
+        if(sq_mag_b < kEpsilon)
+        {
+            return VEC_TYPE(0.0f);
+        }
+
+        /*
+         * Basically, vector projection of vector 'a' on a non zero vector 'b' is given by [dot(a, unit(b)) * unit(b)].
+         * Checkout https://en.wikipedia.org/wiki/Vector_projection
+         */
+        return b * (a.dot(b) / sq_mag_b);
+    }
+
+    [[nodiscard]] friend VEC_TYPE rejection(const VEC_TYPE& a, const VEC_TYPE& b) noexcept
+    {
+        /*
+         * Rejection of vector 'a' onto vector 'b' is the opposite of projection of vector 'a' onto vector 'b'.
+         * To find rejection of 'a' onto 'b', subtract the projection of 'a' onto 'b' from vector 'a'.
+         */
+        return a - projection(a, b);
+    }
+
+    [[nodiscard]] friend VEC_TYPE reflection(const VEC_TYPE& a, const VEC_TYPE& b) noexcept
+    {
+        return a - (2.0f * projection(a, b));
+    }
+
+    [[nodiscard]] friend bool orthonormalize(VEC_TYPE& a, VEC_TYPE& b, VEC_TYPE& c) noexcept
+    {
+#ifdef COPILOT_GENERATED
+        a.normalize();
+        b = rejection(b, a);
+        b.normalize();
+        c = rejection(rejection(c, a), b);
+        c.normalize();
+        return true;
+#endif
+
+        /*
+         * Note that the construction of an orthonormal basis is a situation where it matters a great deal whether you
+         * are working in a left - or right - handed coordinate system. The following algorithm is designed for right -
+         * handed systems. If you need a left - handed coordinate system, then you can simply change the order of the
+         * operands for both the cross - products. This will give you a left - handed orthonormal basis.
+         */
+
+#ifdef LEFT_HANDED_COORDINATE_SYSTEM
+
+        // Left handed coordinate system
+        a.normalize();
+        c = b.cross(a);
+        if(c.isZero())
+        {
+            return false;
+        }
+        c.normalize();
+        b = a.cross(c);
+        return true;
+
+#else
+
+        // Right handed coordinate system
+        a.normalize();
+        c = a.cross(b);
+        if(c.isZero())
+        {
+            return false;
+        }
+        c.normalize();
+        b = c.cross(a);
+        return true;
+
+#endif
+    }
 
     friend std::ostream& operator<<(std::ostream& stream, const VEC_TYPE& vector)
     {
@@ -438,8 +653,8 @@ struct vec3 : public TVector<vec3, real, 3>
         return *this;
     }
 
-    //vec3& operator=(const vec3& rhs) noexcept = default;
-    //vec3& operator=(vec3&& rhs) noexcept = default;
+    // vec3& operator=(const vec3& rhs) noexcept = default;
+    // vec3& operator=(vec3&& rhs) noexcept = default;
 
     [[nodiscard]] vec2 xy() const noexcept { return {x, y}; }
 

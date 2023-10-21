@@ -33,7 +33,7 @@ public:
 
     constexpr size_type columns() const noexcept { return COLUMNS; }
 
-    // constexpr size_type size() const noexcept { return ROWS * COLUMNS; }
+    constexpr size_type size() const noexcept { return ROWS * COLUMNS; }
 
     constexpr pointer data() const noexcept { return type().m.data(); }
 
@@ -155,6 +155,78 @@ public:
         return result;
     }
 
+    MAT_TYPE operator/(const MAT_TYPE& rhs) const noexcept
+    {
+        auto&    self = type();
+        MAT_TYPE result{};
+        for(size_type i = 0; i < size; ++i)
+        {
+            assert(rhs.m[i] > T(kEpsilon));
+            result.m[i] = self.m[i] / rhs.m[i];
+        }
+        return result;
+    }
+
+    MAT_TYPE operator+(const_reference scalar) const noexcept
+    {
+        auto&    self = type();
+        MAT_TYPE result{};
+        for(size_type i = 0; i < size; ++i)
+        {
+            result.m[i] = self.m[i] + scalar;
+        }
+        return result;
+    }
+
+    MAT_TYPE operator-(const_reference scalar) const noexcept
+    {
+        auto&    self = type();
+        MAT_TYPE result{};
+        for(size_type i = 0; i < size; ++i)
+        {
+            result.m[i] = self.m[i] - scalar;
+        }
+        return result;
+    }
+
+    MAT_TYPE operator*(const_reference scalar) const noexcept
+    {
+        auto&    self = type();
+        MAT_TYPE result{};
+        for(size_type i = 0; i < size; ++i)
+        {
+            result.m[i] = self.m[i] * scalar;
+        }
+        return result;
+    }
+
+    MAT_TYPE operator/(const_reference scalar) const noexcept
+    {
+        auto&    self = type();
+        MAT_TYPE result{};
+        for(size_type i = 0; i < size; ++i)
+        {
+            assert(scalar > T(kEpsilon));
+            result.m[i] = self.m[i] / scalar;
+        }
+        return result;
+    }
+
+    MAT_TYPE linearInterpolate(const MAT_TYPE& start, const MAT_TYPE& end, const_reference t) const noexcept
+	{
+		auto&    self = type();
+		MAT_TYPE result{};
+		for(size_type i = 0; i < size; ++i)
+		{
+            result.m[i] = start.m[i] + (end.m[i] - start.m[i]) * t;
+		}
+		return result;
+	}
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////// MAT4 SPECIFIC METHODS ///////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
     template <size_type R = ROWS, size_type C = COLUMNS>
     typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
     {
@@ -180,41 +252,6 @@ public:
         result.m[13] = M4_DOT(1, 3);
         result.m[14] = M4_DOT(2, 3);
         result.m[15] = M4_DOT(3, 3);
-        return result;
-    }
-
-    template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 3 && C == 3, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
-    {
-#define M3_DOT(Ra, Cb)                                                                            \
-    self.m[0 * ROWS + Ra] * rhs.m[Cb * ROWS + 0] + self.m[1 * ROWS + Ra] * rhs.m[Cb * ROWS + 1] + \
-        self.m[2 * ROWS + Ra] * rhs.m[Cb * ROWS + 2];
-
-        const auto& self = type();
-        MAT_TYPE    result{};
-        result.m[0] = M3_DOT(0, 0); // col#1
-        result.m[1] = M3_DOT(1, 0);
-        result.m[2] = M3_DOT(2, 0);
-        result.m[3] = M3_DOT(0, 1); // col#2
-        result.m[4] = M3_DOT(1, 1);
-        result.m[5] = M3_DOT(2, 1);
-        result.m[6] = M3_DOT(0, 2); // col#3
-        result.m[7] = M3_DOT(1, 2);
-        result.m[8] = M3_DOT(2, 2);
-        return result;
-    }
-
-    template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 2 && C == 2, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
-    {
-#define M2_DOT(Ra, Cb) self.m[0 * ROWS + Ra] * rhs.m[Cb * ROWS + 0] + self.m[1 * ROWS + Ra] * rhs.m[Cb * ROWS + 1];
-
-        const auto& self = type();
-        MAT_TYPE    result{};
-        result.m[0] = M2_DOT(0, 0); // col#1
-        result.m[1] = M2_DOT(1, 0);
-        result.m[2] = M2_DOT(0, 1); // col#2
-        result.m[3] = M2_DOT(1, 1);
         return result;
     }
 
@@ -248,7 +285,7 @@ public:
     }
 
     template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> transposed() const noexcept
+    [[nodiscard]] typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> transposed() const noexcept
     {
         MAT_TYPE result(type());
         return result.transpose();
@@ -271,6 +308,10 @@ public:
          * -------------------------------
          * | m[3] | m[7] | m[11] | m[15] |
          * -------------------------------
+         *
+         * Here we are using Laplace Expansion to calculate the determinant.
+         * Determinant is given by the sum of multiplication of each element in the first column if the matrix with its
+         * cofactor.
          *
          */
         value_type  result{T{0}};
@@ -375,79 +416,140 @@ public:
         return copy.invert();
     }
 
-#define DET_2X2(m, r1, c1, r2, c2) (m(r1, c1) * m(r2, c2) - m(r2, c1) * m(r1, c2))
+    ///////////////////////////////////// MAT4 SPECIFIC METHODS END /////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////// MAT3 SPECIFIC METHODS ///////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 3 && C == 3, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
+    {
+#define M3_DOT(Ra, Cb)                                                                            \
+    self.m[0 * ROWS + Ra] * rhs.m[Cb * ROWS + 0] + self.m[1 * ROWS + Ra] * rhs.m[Cb * ROWS + 1] + \
+        self.m[2 * ROWS + Ra] * rhs.m[Cb * ROWS + 2];
+
+        const auto& self = type();
+        MAT_TYPE    result{};
+        result.m[0] = M3_DOT(0, 0); // col#1
+        result.m[1] = M3_DOT(1, 0);
+        result.m[2] = M3_DOT(2, 0);
+        result.m[3] = M3_DOT(0, 1); // col#2
+        result.m[4] = M3_DOT(1, 1);
+        result.m[5] = M3_DOT(2, 1);
+        result.m[6] = M3_DOT(0, 2); // col#3
+        result.m[7] = M3_DOT(1, 2);
+        result.m[8] = M3_DOT(2, 2);
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    [[nodiscard]] typename std::enable_if_t<R == 3 && C == 3, real> determinant() const noexcept
+    {
+        /*
+         * Consider the below layout of the matrix for calculating the cofactor matrix.
+         *
+         * Column-major layout for mat3
+         *
+         * ______________________
+         * | m[0] | m[3] | m[6] |
+         * ----------------------
+         * | m[1] | m[4] | m[7] |
+         * ----------------------
+         * | m[2] | m[5] | m[8] |
+         * ----------------------
+         *
+         */
+        value_type  result{T{0}};
+        const auto& m = type().m;
+        result += m[0] * (m[4] * m[8] - m[5] * m[7]);
+        result -= m[1] * (m[3] * m[8] - m[5] * m[6]);
+        result += m[2] * (m[3] * m[7] - m[4] * m[6]);
+        return result;
+    }
 
     /*!
-     * @brief Calculates the determinant of a 3x3 matrix. The determinant of a matrix is a special scalar that can be
-     * calculated only from a square matrix. The determinant of a matrix remains the same if the matrix is transposed.
+     * @brief Inverts this matrix. If t is not invertible, an identity matrix is returned.
      *
-     * @return The determinant of the matrix.
+     * @return A reference to the inverted matrix.
      */
     template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 3 && C == 3, real> determinant() const noexcept
+    typename std::enable_if_t<R == 3 && C == 3, MAT_TYPE&> invert() noexcept
     {
-        const auto& self   = type();
-        real        result = self.m[0] * DET_2X2(self, 1, 1, 2, 2) - self.m[1] * DET_2X2(self, 0, 1, 2, 2) +
-                      self.m[2] * DET_2X2(self, 0, 1, 1, 2);
+        /*
+         * Consider the below layout of the matrix for calculating the cofactor matrix.
+         *
+         * Column-major layout for mat3
+         *
+         * ______________________
+         * | m[0] | m[3] | m[6] |
+         * ----------------------
+         * | m[1] | m[4] | m[7] |
+         * ----------------------
+         * | m[2] | m[5] | m[8] |
+         * ----------------------
+         *
+         */
+
+        auto&    self = type();
+        MAT_TYPE cofactor_matrix{};
+        auto&    m           = self.m;
+        cofactor_matrix.m[0] = +(m[4] * m[8] - m[5] * m[7]);
+        cofactor_matrix.m[1] = -(m[3] * m[8] - m[5] * m[6]);
+        cofactor_matrix.m[2] = +(m[3] * m[7] - m[4] * m[6]);
+        cofactor_matrix.m[3] = -(m[1] * m[8] - m[2] * m[7]);
+        cofactor_matrix.m[4] = +(m[0] * m[8] - m[2] * m[6]);
+        cofactor_matrix.m[5] = -(m[0] * m[7] - m[1] * m[6]);
+        cofactor_matrix.m[6] = +(m[1] * m[5] - m[2] * m[4]);
+        cofactor_matrix.m[7] = -(m[0] * m[5] - m[2] * m[3]);
+        cofactor_matrix.m[8] = +(m[0] * m[4] - m[1] * m[3]);
+
+        // Calculate the determinant
+        value_type determinant =
+            m[0] * cofactor_matrix.m[0] + m[1] * cofactor_matrix.m[1] + m[2] * cofactor_matrix.m[2];
+        if(determinant < kEpsilon)
+        {
+            return MAT_TYPE{}; // return an identity matrix (maybe have a static property / method)
+        }
+
+        // Transpose the cofactor matrix to get adjugate matrix
+        std::swap(cofactor_matrix.m[1], cofactor_matrix.m[3]);
+        std::swap(cofactor_matrix.m[2], cofactor_matrix.m[6]);
+        std::swap(cofactor_matrix.m[5], cofactor_matrix.m[7]);
+
+        // Divide the adjugate matrix by the determinant to get the inverse of this matrix
+        m = cofactor_matrix / determinant;
+        return self;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 3 && C == 3, MAT_TYPE> inverse() const noexcept
+    {
+        MAT_TYPE copy(type());
+        return copy.invert();
+    }
+
+    ///////////////////////////////////// MAT3 SPECIFIC METHODS END /////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////// MAT2 SPECIFIC METHODS ///////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 2 && C == 2, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
+    {
+#define M2_DOT(Ra, Cb) self.m[0 * ROWS + Ra] * rhs.m[Cb * ROWS + 0] + self.m[1 * ROWS + Ra] * rhs.m[Cb * ROWS + 1];
+
+        const auto& self = type();
+        MAT_TYPE    result{};
+        result.m[0] = M2_DOT(0, 0); // col#1
+        result.m[1] = M2_DOT(1, 0);
+        result.m[2] = M2_DOT(0, 1); // col#2
+        result.m[3] = M2_DOT(1, 1);
         return result;
     }
 
-    MAT_TYPE operator/(const MAT_TYPE& rhs) const noexcept
-    {
-        auto&    self = type();
-        MAT_TYPE result{};
-        for(size_type i = 0; i < size; ++i)
-        {
-            assert(rhs.m[i] > T(kEpsilon));
-            result.m[i] = self.m[i] / rhs.m[i];
-        }
-        return result;
-    }
-
-    MAT_TYPE operator+(const_reference scalar) const noexcept
-    {
-        auto&    self = type();
-        MAT_TYPE result{};
-        for(size_type i = 0; i < size; ++i)
-        {
-            result.m[i] = self.m[i] + scalar;
-        }
-        return result;
-    }
-
-    MAT_TYPE operator-(const_reference scalar) const noexcept
-    {
-        auto&    self = type();
-        MAT_TYPE result{};
-        for(size_type i = 0; i < size; ++i)
-        {
-            result.m[i] = self.m[i] - scalar;
-        }
-        return result;
-    }
-
-    MAT_TYPE operator*(const_reference scalar) const noexcept
-    {
-        auto&    self = type();
-        MAT_TYPE result{};
-        for(size_type i = 0; i < size; ++i)
-        {
-            result.m[i] = self.m[i] * scalar;
-        }
-        return result;
-    }
-
-    MAT_TYPE operator/(const_reference scalar) const noexcept
-    {
-        auto&    self = type();
-        MAT_TYPE result{};
-        for(size_type i = 0; i < size; ++i)
-        {
-            assert(scalar > T(kEpsilon));
-            result.m[i] = self.m[i] / scalar;
-        }
-        return result;
-    }
+    //////////////////////////////////// MAT2 SPECIFIC METHODS END ///////////////////////////////////////
 };
 
 /*
@@ -620,6 +722,20 @@ struct mat4 : public TMatrix<mat4, real, 4, 4>
     mat4& operator=(mat4&& other) noexcept = default;
 };
 
+/*
+ * Consider the below layout of the matrix for calculating the cofactor matrix.
+ *
+ * Column-major layout for mat3
+ *
+ * ______________________
+ * | m[0] | m[3] | m[6] |
+ * ----------------------
+ * | m[1] | m[4] | m[7] |
+ * ----------------------
+ * | m[2] | m[5] | m[8] |
+ * ----------------------
+ *
+ */
 struct mat3 : public TMatrix<mat3, real, 4, 4>
 {
     union
