@@ -438,6 +438,9 @@ struct vec3 : public TVector<vec3, real, 3>
         return *this;
     }
 
+    //vec3& operator=(const vec3& rhs) noexcept = default;
+    //vec3& operator=(vec3&& rhs) noexcept = default;
+
     [[nodiscard]] vec2 xy() const noexcept { return {x, y}; }
 
     [[nodiscard]] vec2 yz() const noexcept { return {y, z}; }
