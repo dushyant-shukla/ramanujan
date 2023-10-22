@@ -33,7 +33,7 @@ public:
 
     constexpr size_type columns() const noexcept { return COLUMNS; }
 
-    constexpr size_type size() const noexcept { return ROWS * COLUMNS; }
+    // constexpr size_type size() const noexcept { return ROWS * COLUMNS; }
 
     constexpr pointer data() const noexcept { return type().m.data(); }
 
@@ -118,7 +118,7 @@ public:
         return self;
     }
 
-    bool operator==(const mat4& rhs) const noexcept
+    bool operator==(const MAT_TYPE& rhs) const noexcept
     {
         const auto& self = type();
         for(size_type i = 0; i < size; ++i)
@@ -212,16 +212,34 @@ public:
         return result;
     }
 
-    MAT_TYPE linearInterpolate(const MAT_TYPE& start, const MAT_TYPE& end, const_reference t) const noexcept
-	{
-		auto&    self = type();
-		MAT_TYPE result{};
-		for(size_type i = 0; i < size; ++i)
-		{
+    MAT_TYPE lerp(const MAT_TYPE& start, const MAT_TYPE& end, const_reference t) const noexcept
+    {
+        auto&    self = type();
+        MAT_TYPE result{};
+        for(size_type i = 0; i < size; ++i)
+        {
             result.m[i] = start.m[i] + (end.m[i] - start.m[i]) * t;
-		}
-		return result;
-	}
+        }
+        return result;
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const MAT_TYPE& matrix) noexcept
+    {
+        for(size_type col = 0; col < COLUMNS; ++col)
+        {
+            stream << "[";
+            for(size_type row = 0; row < ROWS; ++row)
+            {
+                stream << matrix.m[col * ROWS + row];
+                if(row < ROWS - 1)
+                {
+                    stream << "\t";
+                }
+            }
+            stream << "]" << std::endl;
+        }
+        return stream;
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////// MAT4 SPECIFIC METHODS ///////////////////////////////////////
@@ -416,11 +434,94 @@ public:
         return copy.invert();
     }
 
-    ///////////////////////////////////// MAT4 SPECIFIC METHODS END /////////////////////////////////////
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> scale(const vec3& scale) const noexcept
+    {
+        // This is copilot generated code
+        // Todo:: learn this? Why multiplying scale and not adding?
+        const auto& self = type();
+        MAT_TYPE    result(self);
+        result.m[0] *= scale.x;
+        result.m[5] *= scale.y;
+        result.m[10] *= scale.z;
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> rotate(const vec3& axis, const real& radians) const noexcept
+    {
+        // This is copilot generated code
+        // Todo:: learn this? how to encode rotation into a matrix
+        const auto& self = type();
+        MAT_TYPE    result(self);
+        const real  c = real_cos(radians);
+        const real  s = real_sin(radians);
+        const real  t = 1 - c;
+        const real  x = axis.x;
+        const real  y = axis.y;
+        const real  z = axis.z;
+        result.m[0]   = t * x * x + c;
+        result.m[1]   = t * x * y + s * z;
+        result.m[2]   = t * x * z - s * y;
+        result.m[4]   = t * x * y - s * z;
+        result.m[5]   = t * y * y + c;
+        result.m[6]   = t * y * z + s * x;
+        result.m[8]   = t * x * z + s * y;
+        result.m[9]   = t * y * z - s * x;
+        result.m[10]  = t * z * z + c;
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> translate(const vec3& translation) const noexcept
+    {
+        const auto& self = type();
+        MAT_TYPE    result(self);
+        result.m[12] += translation.x;
+        result.m[13] += translation.y;
+        result.m[14] += translation.z;
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, vec3> transformVector(const vec3& vector) const noexcept
+    {
+        const auto& self = type();
+        vec3        result(vector);
+        result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8];
+        result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9];
+        result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10];
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, vec3> transformPoint(const vec3& vector) const noexcept
+    {
+        const auto& self = type();
+        vec3        result(vector);
+        result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8] + self.m[12];
+        result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9] + self.m[13];
+        result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10] + self.m[14];
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, vec3> transformPoint(const vec3& vector, real& w) const noexcept
+    {
+        const auto& self = type();
+        vec3        result(vector);
+        result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8] + w * self.m[12];
+        result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9] + w * self.m[13];
+        result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10] + w * self.m[14];
+        w        = vector.x * self.m[3] + vector.y * self.m[7] + vector.z * self.m[11] + w * self.m[15];
+        return result;
+    }
+
+    ////////////////////////////////////// MAT4 SPECIFIC METHODS END /////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////// MAT3 SPECIFIC METHODS ///////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     template <size_type R = ROWS, size_type C = COLUMNS>
     typename std::enable_if_t<R == 3 && C == 3, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
@@ -529,11 +630,11 @@ public:
         return copy.invert();
     }
 
-    ///////////////////////////////////// MAT3 SPECIFIC METHODS END /////////////////////////////////////
+    ////////////////////////////////////// MAT3 SPECIFIC METHODS END /////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////// MAT2 SPECIFIC METHODS ///////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     template <size_type R = ROWS, size_type C = COLUMNS>
     typename std::enable_if_t<R == 2 && C == 2, MAT_TYPE> operator*(const MAT_TYPE& rhs) const noexcept
@@ -583,10 +684,10 @@ struct mat4 : public TMatrix<mat4, real, 4, 4>
         // basis vectors notation
         struct
         {
-            const vec4& right;    // column#1
-            const vec4& up;       // column#2
-            const vec4& forward;  // column#3
-            const vec4& position; // column#4
+            vec4 right;    // column#1
+            vec4 up;       // column#2
+            vec4 forward;  // column#3
+            vec4 position; // column#4
         };
 
         struct
@@ -618,10 +719,10 @@ struct mat4 : public TMatrix<mat4, real, 4, 4>
         // column-major notation
         struct
         {
-            const vec4& col0;
-            const vec4& col1;
-            const vec4& col2;
-            const vec4& col3;
+            vec4 col0;
+            vec4 col1;
+            vec4 col2;
+            vec4 col3;
         };
 
         std::array<real, 16> m;
@@ -750,9 +851,9 @@ struct mat3 : public TMatrix<mat3, real, 4, 4>
         // basis vectors notation
         struct
         {
-            const vec3& right;   // column#1
-            const vec3& up;      // column#2
-            const vec3& forward; // column#3
+            vec3 right;   // column#1
+            vec3 up;      // column#2
+            vec3 forward; // column#3
         };
 
         struct
@@ -781,9 +882,9 @@ struct mat3 : public TMatrix<mat3, real, 4, 4>
         // column-major notation
         struct
         {
-            const vec3& col0;
-            const vec3& col1;
-            const vec3& col2;
+            vec3 col0;
+            vec3 col1;
+            vec3 col2;
         };
 
         std::array<real, 9> m;
