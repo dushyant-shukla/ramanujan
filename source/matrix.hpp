@@ -351,7 +351,7 @@ public:
      * @return A reference to the inverted matrix.
      */
     template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE&> invert() noexcept
+    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> invert() noexcept
     {
         /*
          * Consider the below layout of the matrix for calculating the cofactor matrix.
@@ -373,6 +373,7 @@ public:
         auto&    self = type();
         MAT_TYPE cofactor_matrix{};
         auto&    m           = self.m;
+        std::cout << self;
         cofactor_matrix.m[0] = (m[5] * (m[10] * m[15] - m[11] * m[14]) - m[9] * (m[6] * m[15] - m[7] * m[14]) +
                                 m[13] * (m[6] * m[11] - m[7] * m[10]));
         cofactor_matrix.m[1] = -(m[4] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[6] * m[15] - m[7] * m[14]) +
@@ -384,7 +385,7 @@ public:
         cofactor_matrix.m[4] = -(m[1] * (m[10] * m[15] - m[11] * m[14])) - m[9] * (m[2] * m[15] - m[3] * m[14]) +
                                m[13] * (m[2] * m[11] - m[3] * m[10]);
         cofactor_matrix.m[5]  = (m[0] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[2] * m[15] - m[3] * m[14]) +
-                                m[12] * (m[2 * m[11] - m[3] * m[10]]));
+                                m[12] * (m[2] * m[11] - m[3] * m[10]));
         cofactor_matrix.m[6]  = -(m[0] * (m[9] * m[15] - m[11] * m[13]) - m[8] * (m[1] * m[15] - m[3] * m[13]) +
                                  m[12] * (m[1] * m[11] - m[3] * m[9]));
         cofactor_matrix.m[7]  = (m[0] * (m[9] * m[14] - m[10] * m[13]) - m[8] * (m[1] * m[14] - m[2] * m[13]) +
@@ -423,8 +424,10 @@ public:
         std::swap(cofactor_matrix.m[11], cofactor_matrix.m[14]);
 
         // Divide the adjugate matrix by the determinant to get the inverse of this matrix
-        m = cofactor_matrix / determinant;
-        return self;
+        // Todo:: This is a bug in the original code. It should be cofactor_matrix /= determinant
+        //m = cofactor_matrix / determinant;
+        cofactor_matrix /= determinant;
+        return cofactor_matrix;
     }
 
     template <size_type R = ROWS, size_type C = COLUMNS>
@@ -799,26 +802,28 @@ struct mat4 : public TMatrix<mat4, real, 4, 4>
     {
     }
 
-    mat4& operator=(const mat4& other) noexcept = default;
-    //{
-    //    xx = other.xx;
-    //    xy = other.xy;
-    //    xz = other.xz;
-    //    xw = other.xw;
-    //    yx = other.yx;
-    //    yy = other.yy;
-    //    yz = other.yz;
-    //    yw = other.yw;
-    //    zx = other.zx;
-    //    zy = other.zy;
-    //    zz = other.zz;
-    //    zw = other.zw;
-    //    tx = other.tx;
-    //    ty = other.ty;
-    //    tz = other.tz;
-    //    tw = other.tw;
-    //    return *this;
-    //}
+    mat4(const mat4& other) : m(other.m) {}
+
+    mat4& operator=(const mat4& other) /* noexcept = default;*/
+    {
+        xx = other.xx;
+        xy = other.xy;
+        xz = other.xz;
+        xw = other.xw;
+        yx = other.yx;
+        yy = other.yy;
+        yz = other.yz;
+        yw = other.yw;
+        zx = other.zx;
+        zy = other.zy;
+        zz = other.zz;
+        zw = other.zw;
+        tx = other.tx;
+        ty = other.ty;
+        tz = other.tz;
+        tw = other.tw;
+        return *this;
+    }
 
     mat4& operator=(mat4&& other) noexcept = default;
 };

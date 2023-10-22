@@ -3,6 +3,8 @@
 #include "vector3.h"
 #include "vector4.h"
 
+#include "matrix.hpp"
+
 namespace ramanujan
 {
 
@@ -190,6 +192,12 @@ struct Matrix4
     friend Matrix4 operator*(const Matrix4& a, real f);
     friend Matrix4 operator*(const Matrix4& a, const Matrix4& b);
     friend Vector4 operator*(const Matrix4& m, const Vector4&);
+
+    operator ramanujan::experimental::mat4() const
+    {
+        return ramanujan::experimental::mat4{xx, xy, xz, xw, yx, yy, yz, yw, zx, zy, zz, zw, tx, ty, tz, tw};
+    }
+
 }; // struct Mat4
 
 void    Transpose(Matrix4& m);
