@@ -373,7 +373,6 @@ public:
         auto&    self = type();
         MAT_TYPE cofactor_matrix{};
         auto&    m           = self.m;
-        std::cout << self;
         cofactor_matrix.m[0] = (m[5] * (m[10] * m[15] - m[11] * m[14]) - m[9] * (m[6] * m[15] - m[7] * m[14]) +
                                 m[13] * (m[6] * m[11] - m[7] * m[10]));
         cofactor_matrix.m[1] = -(m[4] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[6] * m[15] - m[7] * m[14]) +
