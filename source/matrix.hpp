@@ -225,13 +225,13 @@ public:
 
     friend std::ostream& operator<<(std::ostream& stream, const MAT_TYPE& matrix) noexcept
     {
-        for(size_type col = 0; col < COLUMNS; ++col)
+        for(size_type row = 0; row < ROWS; ++row)
         {
             stream << "[";
-            for(size_type row = 0; row < ROWS; ++row)
+            for(size_type col = 0; col < COLUMNS; ++col)
             {
                 stream << matrix.m[col * ROWS + row];
-                if(row < ROWS - 1)
+                if(col < COLUMNS - 1)
                 {
                     stream << "\t";
                 }
@@ -372,17 +372,17 @@ public:
 
         auto&    self = type();
         MAT_TYPE cofactor_matrix{};
-        auto&    m           = self.m;
-        cofactor_matrix.m[0] = (m[5] * (m[10] * m[15] - m[11] * m[14]) - m[9] * (m[6] * m[15] - m[7] * m[14]) +
+        auto&    m            = self.m;
+        cofactor_matrix.m[0]  = (m[5] * (m[10] * m[15] - m[11] * m[14]) - m[9] * (m[6] * m[15] - m[7] * m[14]) +
                                 m[13] * (m[6] * m[11] - m[7] * m[10]));
-        cofactor_matrix.m[1] = -(m[4] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[6] * m[15] - m[7] * m[14]) +
+        cofactor_matrix.m[1]  = -(m[4] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[6] * m[15] - m[7] * m[14]) +
                                  m[12] * (m[6] * m[11] - m[7] * m[10]));
-        cofactor_matrix.m[2] = (m[4] * (m[9] * m[15] - m[11] * m[13]) - m[8] * (m[5] * m[15] - m[7] * m[13]) +
+        cofactor_matrix.m[2]  = (m[4] * (m[9] * m[15] - m[11] * m[13]) - m[8] * (m[5] * m[15] - m[7] * m[13]) +
                                 m[12] * (m[5] * m[11] - m[9] * m[7]));
-        cofactor_matrix.m[3] = -(m[4] * (m[9] * m[14] - m[10] * m[13]) - m[8] * (m[5] * m[14] - m[6] * m[13]) +
+        cofactor_matrix.m[3]  = -(m[4] * (m[9] * m[14] - m[10] * m[13]) - m[8] * (m[5] * m[14] - m[6] * m[13]) +
                                  m[12] * (m[5] * m[10] - m[6] * m[9]));
-        cofactor_matrix.m[4] = -(m[1] * (m[10] * m[15] - m[11] * m[14])) - m[9] * (m[2] * m[15] - m[3] * m[14]) +
-                               m[13] * (m[2] * m[11] - m[3] * m[10]);
+        cofactor_matrix.m[4]  = -(m[1] * (m[10] * m[15] - m[11] * m[14]) - m[9] * (m[2] * m[15] - m[3] * m[14]) +
+                                 m[13] * (m[2] * m[11] - m[3] * m[10]));
         cofactor_matrix.m[5]  = (m[0] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[2] * m[15] - m[3] * m[14]) +
                                 m[12] * (m[2] * m[11] - m[3] * m[10]));
         cofactor_matrix.m[6]  = -(m[0] * (m[9] * m[15] - m[11] * m[13]) - m[8] * (m[1] * m[15] - m[3] * m[13]) +
@@ -401,7 +401,7 @@ public:
                                   m[9] * (m[2] * m[7] - m[3] * m[6]));
         cofactor_matrix.m[13] = (m[0] * (m[6] * m[11] - m[7] * m[10]) - m[4] * (m[2] * m[11] - m[3] * m[10]) +
                                  m[8] * (m[2] * m[7] - m[3] * m[6]));
-        cofactor_matrix.m[14] = -(m[0] * (m[5] * m[11] - m[9] * m[7]) - m[4] * (m[1] * m[10] - m[9] * m[3]) +
+        cofactor_matrix.m[14] = -(m[0] * (m[5] * m[11] - m[9] * m[7]) - m[4] * (m[1] * m[11] - m[9] * m[3]) +
                                   m[8] * (m[1] * m[7] - m[5] * m[3]));
         cofactor_matrix.m[15] = (m[0] * (m[5] * m[10] - m[6] * m[9]) - m[4] * (m[1] * m[10] - m[2] * m[9]) +
                                  m[8] * (m[1] * m[6] - m[2] * m[5]));
@@ -424,7 +424,7 @@ public:
 
         // Divide the adjugate matrix by the determinant to get the inverse of this matrix
         // Todo:: This is a bug in the original code. It should be cofactor_matrix /= determinant
-        //m = cofactor_matrix / determinant;
+        // m = cofactor_matrix / determinant;
         cofactor_matrix /= determinant;
         return cofactor_matrix;
     }
