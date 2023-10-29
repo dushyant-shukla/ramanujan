@@ -25,6 +25,16 @@ public:
     VEC_TYPE&       type() { return static_cast<VEC_TYPE&>(*this); }
     const VEC_TYPE& type() const { return static_cast<const VEC_TYPE&>(*this); }
 
+    VEC_TYPE& operator-() noexcept
+    {
+        auto& self = type();
+        for(size_type i = 0; i < N; ++i)
+        {
+            self.data[i] = -self.data[i];
+        }
+        return self;
+    }
+
     VEC_TYPE& operator+=(const VEC_TYPE& rhs) noexcept
     {
         auto& self = type();
@@ -282,6 +292,10 @@ public:
         }
         return result;
     }
+
+    [[nodiscard]] real magnitude() const noexcept { return length(); }
+
+    [[nodiscard]] real magnitudeSquared() const noexcept { return lengthSquared(); }
 
     [[nodiscard]] bool operator==(const VEC_TYPE& rhs) const noexcept { return type().data == rhs.data; }
 
