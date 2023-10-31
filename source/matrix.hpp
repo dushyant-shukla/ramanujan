@@ -736,7 +736,23 @@ struct mat4 : public TMatrix<mat4, real, 4, 4>
     //     , forward{0, 0, real(1.0), 0}
     //     , position{0, 0, 0, real(1.0)} {};
 
-    mat4() noexcept : xx{real(1.0)}, yy{real(1.0)}, zz{real(1.0)}, tw{real(1.0)} {};
+    mat4() noexcept
+        : xx(real(1.0)) // col#1
+        , xy(real(0.0))
+        , xz(real(0.0))
+        , xw(real(0.0))
+        , yx(real(0.0)) // col#2
+        , yy(real(1.0))
+        , yz(real(0.0))
+        , yw(real(0.0))
+        , zx(real(0.0)) // col#3
+        , zy(real(0.0))
+        , zz(real(1.0))
+        , zw(real(0.0))
+        , tx(real(0.0)) // col#4
+        , ty(real(0.0))
+        , tz(real(0.0))
+        , tw(real(1.0)){};
 
     mat4(const real* const v) noexcept
         : xx(v[0]) // col#1
