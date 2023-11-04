@@ -32,6 +32,8 @@ constexpr auto kRealMax  = FLT_MAX;
 #define real_sin(x) sinf(x)
 #define real_cos(x) cosf(x)
 #define real_abs(x) fabsf(x)
+#define real_min(x, y) fminf(x, y)
+#define real_max(x, y) fmaxf(x, y)
 
 #else
 
@@ -51,6 +53,8 @@ constexpr auto kRealMax  = DBL_MAX;
 #define real_sin(x) sin(x)
 #define real_cos(x) cos(x)
 #define real_abs(x) fabs(x)
+#define real_min(x, y) fmin(x, y)
+#define real_max(x, y) fmax(x, y)
 
 #endif
 
