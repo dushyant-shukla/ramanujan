@@ -198,6 +198,24 @@ struct Matrix4
         return ramanujan::experimental::mat4{xx, xy, xz, xw, yx, yy, yz, yw, zx, zy, zz, zw, tx, ty, tz, tw};
     }
 
+    friend std::ostream& operator<<(std::ostream& stream, const Matrix4& matrix) noexcept
+    {
+        for(unsigned int row = 0; row < 4; ++row)
+        {
+            stream << "[";
+            for(unsigned int col = 0; col < 4; ++col)
+            {
+                stream << matrix.v[col * 4 + row];
+                if(col < 3)
+                {
+                    stream << "\t";
+                }
+            }
+            stream << "]" << std::endl;
+        }
+        return stream;
+    }
+
 }; // struct Mat4
 
 void    Transpose(Matrix4& m);

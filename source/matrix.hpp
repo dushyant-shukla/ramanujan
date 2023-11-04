@@ -33,8 +33,6 @@ public:
 
     constexpr size_type columns() const noexcept { return COLUMNS; }
 
-    // constexpr size_type size() const noexcept { return ROWS * COLUMNS; }
-
     constexpr pointer data() const noexcept { return type().m.data(); }
 
     constexpr const_pointer data() noexcept { return type().m.data(); }
@@ -71,7 +69,7 @@ public:
         auto& self = type();
         for(size_type i = 0; i < size; ++i)
         {
-            assert(rhs.m[i] > T(0));
+            assert(real_abs(rhs.m[i]) > T(kEpsilon));
             self.m[i] /= rhs.m[i];
         }
         return self;
@@ -109,7 +107,7 @@ public:
 
     MAT_TYPE& operator/=(const_reference scalar) noexcept
     {
-        assert(scalar > T(0));
+        assert(real_abs(scalar) > T(kEpsilon));
         auto& self = type();
         for(size_type i = 0; i < size; ++i)
         {
@@ -161,7 +159,7 @@ public:
         MAT_TYPE result{};
         for(size_type i = 0; i < size; ++i)
         {
-            assert(rhs.m[i] > T(kEpsilon));
+            assert(real_abs(rhs.m[i]) > T(kEpsilon));
             result.m[i] = self.m[i] / rhs.m[i];
         }
         return result;
@@ -206,7 +204,7 @@ public:
         MAT_TYPE result{};
         for(size_type i = 0; i < size; ++i)
         {
-            assert(scalar > T(kEpsilon));
+            assert(real_abs(scalar) > T(kEpsilon));
             result.m[i] = self.m[i] / scalar;
         }
         return result;
@@ -351,7 +349,7 @@ public:
      * @return A reference to the inverted matrix.
      */
     template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> invert() noexcept
+    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> inverted() noexcept
     {
         /*
          * Consider the below layout of the matrix for calculating the cofactor matrix.
@@ -370,9 +368,9 @@ public:
          *
          */
 
-        auto&    self = type();
-        MAT_TYPE cofactor_matrix{};
-        auto&    m            = self.m;
+        auto&       self = type();
+        MAT_TYPE    cofactor_matrix{};
+        const auto& m         = self.m;
         cofactor_matrix.m[0]  = (m[5] * (m[10] * m[15] - m[11] * m[14]) - m[9] * (m[6] * m[15] - m[7] * m[14]) +
                                 m[13] * (m[6] * m[11] - m[7] * m[10]));
         cofactor_matrix.m[1]  = -(m[4] * (m[10] * m[15] - m[11] * m[14]) - m[8] * (m[6] * m[15] - m[7] * m[14]) +
@@ -409,7 +407,7 @@ public:
         // Calculate the determinant
         value_type determinant = m[0] * cofactor_matrix.m[0] + m[1] * cofactor_matrix.m[1] +
                                  m[2] * cofactor_matrix.m[2] + m[3] * cofactor_matrix.m[3];
-        if(determinant < kEpsilon)
+        if(real_abs(determinant) < kEpsilon)
         {
             return MAT_TYPE{}; // return an identity matrix (maybe have a static property / method)
         }
@@ -423,17 +421,8 @@ public:
         std::swap(cofactor_matrix.m[11], cofactor_matrix.m[14]);
 
         // Divide the adjugate matrix by the determinant to get the inverse of this matrix
-        // Todo:: This is a bug in the original code. It should be cofactor_matrix /= determinant
-        // m = cofactor_matrix / determinant;
         cofactor_matrix /= determinant;
         return cofactor_matrix;
-    }
-
-    template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> inverse() const noexcept
-    {
-        MAT_TYPE copy(type());
-        return copy.invert();
     }
 
     template <size_type R = ROWS, size_type C = COLUMNS>
@@ -488,6 +477,23 @@ public:
     template <size_type R = ROWS, size_type C = COLUMNS>
     typename std::enable_if_t<R == 4 && C == 4, vec3> transformVector(const vec3& vector) const noexcept
     {
+        /*
+         * Consider the below layout of the matrix for calculating the cofactor matrix.
+         *
+         * Column-major layout for mat4
+         *
+         * _______________________________   _______
+         * | m[0] | m[4] | m[8]  | m[12] |   | v.x |
+         * -------------------------------   -------
+         * | m[1] | m[5] | m[9]  | m[13] |   | v.y |
+         * ------------------------------- X -------
+         * | m[2] | m[6] | m[10] | m[14] |   | v.z |
+         * -------------------------------   -------
+         * | m[3] | m[7] | m[11] | m[15] |   |  1  |
+         * -------------------------------   -------
+         *
+         */
+
         const auto& self = type();
         vec3        result(vector);
         result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8];
@@ -910,13 +916,18 @@ struct mat3 : public TMatrix<mat3, real, 4, 4>
         std::array<real, 9> m;
     };
 
-    // mat3() noexcept
-    //     : right{real(1.0), 0, 0, 0}
-    //     , up{0, real(1.0), 0, 0}
-    //     , forward{0, 0, real(1.0), 0}
-    //     , position{0, 0, 0, real(1.0)} {};
-
-    mat3() noexcept : xx{real(1.0)}, yy{real(1.0)}, tw{real(1.0)} {};
+    mat3() noexcept
+        : xx{real(1.0)} // col#1
+        , xy(real(0.0))
+        , xw(real(0.0))
+        , yx(real(0.0)) // col#2
+        , yy{real(1.0)}
+        , yw(real(0.0))
+        , tx(real(0.0)) // col#3
+        , ty(real(0.0))
+        , tw{real(1.0)}
+    {
+    }
 
     mat3(const real* const v) noexcept
         : xx(v[0]) // col#1
