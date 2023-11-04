@@ -827,22 +827,25 @@ struct mat4 : public TMatrix<mat4, real, 4, 4>
 
     mat4& operator=(const mat4& other) /* noexcept = default;*/
     {
-        xx = other.xx;
-        xy = other.xy;
-        xz = other.xz;
-        xw = other.xw;
-        yx = other.yx;
-        yy = other.yy;
-        yz = other.yz;
-        yw = other.yw;
-        zx = other.zx;
-        zy = other.zy;
-        zz = other.zz;
-        zw = other.zw;
-        tx = other.tx;
-        ty = other.ty;
-        tz = other.tz;
-        tw = other.tw;
+        if(*this != other)
+        {
+            xx = other.xx;
+            xy = other.xy;
+            xz = other.xz;
+            xw = other.xw;
+            yx = other.yx;
+            yy = other.yy;
+            yz = other.yz;
+            yw = other.yw;
+            zx = other.zx;
+            zy = other.zy;
+            zz = other.zz;
+            zw = other.zw;
+            tx = other.tx;
+            ty = other.ty;
+            tz = other.tz;
+            tw = other.tw;
+        }
         return *this;
     }
 
@@ -967,26 +970,24 @@ struct mat3 : public TMatrix<mat3, real, 4, 4>
     {
     }
 
-    mat3& operator=(const mat3& other) noexcept = default;
-    //{
-    //    xx = other.xx;
-    //    xy = other.xy;
-    //    xz = other.xz;
-    //    xw = other.xw;
-    //    yx = other.yx;
-    //    yy = other.yy;
-    //    yz = other.yz;
-    //    yw = other.yw;
-    //    zx = other.zx;
-    //    zy = other.zy;
-    //    zz = other.zz;
-    //    zw = other.zw;
-    //    tx = other.tx;
-    //    ty = other.ty;
-    //    tz = other.tz;
-    //    tw = other.tw;
-    //    return *this;
-    //}
+    mat3(const mat3& other) : m(other.m) {}
+
+    mat3& operator=(const mat3& other) noexcept
+    {
+        if(*this != other)
+        {
+            xx = other.xx;
+            xy = other.xy;
+            xw = other.xw;
+            yx = other.yx;
+            yy = other.yy;
+            yw = other.yw;
+            tx = other.tx;
+            ty = other.ty;
+            tw = other.tw;
+        }
+        return *this;
+    }
 
     mat3& operator=(mat3&& other) noexcept = default;
 };
