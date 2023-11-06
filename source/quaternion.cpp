@@ -1,6 +1,7 @@
 #include "quaternion.h"
 #include "constants.h"
 
+#include "quaternion.hpp"
 #include <math.h>
 
 namespace ramanujan
@@ -314,3 +315,311 @@ Quaternion Slerp(const Quaternion& from, const Quaternion& to, real t)
 }
 
 } // namespace ramanujan
+
+namespace ramanujan::experimental
+{
+
+quat::quat() noexcept : x(real{0.0}), y(real{0.0}), z(real{0.0}), w(real{0.0}) {}
+
+quat::quat(const real& _x, const real& _y, const real& _z, const real& _w) noexcept : x(_x), y(_y), z(_z), w(_w) {}
+
+quat::quat(const real* const data) noexcept : x(data[0]), y(data[1]), z(data[2]), w(data[3]) {}
+
+quat::quat(const quat& other) noexcept : vector{other.vector}, scalar{other.scalar} {}
+
+quat::quat(quat&& other) noexcept : vector{std::move(other.vector)}, scalar{std::move(other.scalar)} {}
+
+quat& quat::operator=(const quat& other) noexcept
+{
+    if(*this != other)
+    {
+        x = other.x;
+        y = other.y;
+        z = other.z;
+        w = other.w;
+    }
+    return *this;
+}
+
+//quat& quat::operator=(quat&& other) noexcept
+//{
+//    if(*this != other)
+//    {
+//        x = other.x;
+//        y = other.y;
+//        z = other.z;
+//        w = other.w;
+//    }
+//    return *this;
+//}
+
+quat& quat::operator+=(const quat& rhs) noexcept
+{
+    x += rhs.x;
+    y += rhs.y;
+    z += rhs.z;
+    w += rhs.w;
+    return *this;
+}
+
+quat& quat::operator-=(const quat& rhs) noexcept
+{
+    x -= rhs.x;
+    y -= rhs.y;
+    z -= rhs.z;
+    w -= rhs.w;
+    return *this;
+}
+
+quat& quat::operator*=(const quat& rhs) noexcept
+{
+    quat temp{*this};
+
+    x = rhs.x * temp.w + rhs.y * temp.z - rhs.z * temp.y + rhs.w * temp.x;
+    y = -rhs.x * temp.z + rhs.y * temp.w + rhs.z * temp.x + rhs.w * temp.y;
+    z = rhs.x * temp.y - rhs.y * temp.x + rhs.z * temp.w + rhs.w * temp.z;
+    w = -rhs.x * temp.x - rhs.y * temp.y - rhs.z * temp.z + rhs.w * temp.w;
+
+    // scalar = temp.scalar * rhs.scalar - temp.vector.dot(rhs.vector);
+    // vector = temp.scalar * rhs.vector + temp.vector * rhs.scalar + temp.vector.cross(rhs.vector);
+
+    return *this;
+}
+
+quat& quat::operator/=(const quat& rhs) noexcept
+{
+    assert(rhs.x > kEpsilon);
+    assert(rhs.y > kEpsilon);
+    assert(rhs.z > kEpsilon);
+    assert(rhs.w > kEpsilon);
+    x /= rhs.x;
+    y /= rhs.y;
+    z /= rhs.z;
+    w /= rhs.w;
+    return *this;
+}
+
+quat quat::operator+(const quat& rhs) const noexcept
+{
+    return {x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w};
+}
+
+quat quat::operator-(const quat& rhs) const noexcept
+{
+    return {x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w};
+}
+
+quat quat::operator*(const quat& rhs) const noexcept
+{
+    quat result{};
+    result.x = rhs.x * w + rhs.y * z - rhs.z * y + rhs.w * x;
+    result.y = -rhs.x * z + rhs.y * w + rhs.z * x + rhs.w * y;
+    result.z = rhs.x * y - rhs.y * x + rhs.z * w + rhs.w * z;
+    result.w = -rhs.x * x - rhs.y * y - rhs.z * z + rhs.w * w;
+
+    // result.scalar = scalar * rhs.scalar - vector.dot(rhs.vector);
+    // result.vector = scalar * rhs.vector + vector * rhs.scalar + vector.cross(rhs.vector);
+
+    return result;
+}
+
+quat quat::operator/(const quat& rhs) const noexcept
+{
+    assert(rhs.x > kEpsilon);
+    assert(rhs.y > kEpsilon);
+    assert(rhs.z > kEpsilon);
+    assert(rhs.w > kEpsilon);
+    return {x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w};
+}
+
+quat& quat::operator+=(const real& scalar) noexcept
+{
+    return *this;
+}
+
+quat& quat::operator-=(const real& scalar) noexcept
+{
+    return *this;
+}
+
+quat& quat::operator*=(const real& scalar) noexcept
+{
+    return *this;
+}
+
+quat& quat::operator/=(const real& scalar) noexcept
+{
+    return *this;
+}
+
+quat& quat::operator^=(const real& scalar) noexcept
+{
+    return *this;
+}
+
+quat quat::operator+(const real& scalar) const noexcept
+{
+    return quat();
+}
+
+quat quat::operator-(const real& scalar) const noexcept
+{
+    return quat();
+}
+
+quat quat::operator*(const real& scalar) const noexcept
+{
+    return quat();
+}
+
+quat quat::operator/(const real& scalar) const noexcept
+{
+    return quat();
+}
+
+quat quat::operator^(const real& scalar) const noexcept
+{
+    return quat();
+}
+
+quat quat::operator-() const noexcept
+{
+    return quat();
+}
+
+real* quat::data() noexcept
+{
+    return nullptr;
+}
+
+const real* quat::data() const noexcept
+{
+    return nullptr;
+}
+
+real quat::length() const noexcept
+{
+    return real();
+}
+
+real quat::lengthSquared() const noexcept
+{
+    return real();
+}
+
+quat& quat::normalize() noexcept
+{
+    return *this;
+}
+
+quat quat::normalized() const noexcept
+{
+    return quat();
+}
+
+bool quat::operator==(const quat& rhs) const noexcept
+{
+    return false;
+}
+
+bool quat::operator!=(const quat& rhs) const noexcept
+{
+    return false;
+}
+
+vec3 quat::operator*(const vec3& vector) const noexcept
+{
+    return vec3();
+}
+
+real quat::dot(const quat& rhs) const noexcept
+{
+    return real();
+}
+
+quat quat::conjugate() const noexcept
+{
+    return quat();
+}
+
+quat quat::inverse() const noexcept
+{
+    return quat();
+}
+
+vec3 quat::rotate(const vec3& vector) const noexcept
+{
+    return vec3();
+}
+
+vec3 quat::toEuler() const noexcept
+{
+    return vec3();
+}
+
+vec3 quat::toEulerDegrees() const noexcept
+{
+    return vec3();
+}
+
+quat quat::fromEuler(const vec3& euler) noexcept
+{
+    return quat();
+}
+
+quat quat::fromEulerDegrees(const vec3& euler) noexcept
+{
+    return quat();
+}
+
+quat quat::identity() noexcept
+{
+    return quat();
+}
+
+quat quat::lerp(const quat& a, const quat& b, const real& t) noexcept
+{
+    return quat();
+}
+
+quat quat::nlerp(const quat& a, const quat& b, const real& t) noexcept
+{
+    return quat();
+}
+
+quat quat::slerp(const quat& a, const quat& b, const real& t) noexcept
+{
+    return quat();
+}
+
+quat quat::fromAxisAngle(const vec3& axis, const real& angle) noexcept
+{
+    return quat();
+}
+
+quat quat::fromAxisAngle(const real& x, const real& y, const real& z, const real& angle) noexcept
+{
+    return quat();
+}
+
+quat quat::fromRotationMatrix(const mat4& matrix) noexcept
+{
+    return quat();
+}
+
+quat quat::fromDirection(const vec3& direction, const vec3& up) noexcept
+{
+    return quat();
+}
+
+quat quat::fromLookAt(const vec3& eye, const vec3& target, const vec3& up) noexcept
+{
+    return quat();
+}
+
+quat quat::fromRotationTo(const vec3& from, const vec3& to) noexcept
+{
+    return quat();
+}
+
+} // namespace ramanujan::experimental

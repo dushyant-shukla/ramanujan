@@ -425,7 +425,7 @@ public:
          * When the value of t is close to 0, slerp will yield unexpected results.
          * Therefore, we fall back to lerp or normalized lerp(nlerp).
          */
-        if(t < 0.01f)
+        if(t < real(0.01))
         {
             return lerp(start, end, t);
         }
@@ -452,7 +452,7 @@ public:
         real sq_mag_b = b.lengthSquared();
         if(sq_mag_a < kEpsilon || sq_mag_b < kEpsilon)
         {
-            return 0.0f;
+            return real(0.0);
         }
         return real_acos(a.dot(b) / (a.length() * b.length()));
     }
@@ -462,7 +462,7 @@ public:
         real sq_mag_b = b.lengthSquared();
         if(sq_mag_b < kEpsilon)
         {
-            return VEC_TYPE(0.0f);
+            return VEC_TYPE(real(0.0));
         }
 
         /*
