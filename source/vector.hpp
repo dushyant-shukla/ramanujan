@@ -765,6 +765,118 @@ struct vec4 : public TVector<vec4, real, 4>
     [[nodiscard]] vec3 zyx() const noexcept { return {z, y, x}; }
 };
 
+struct ivec2 : public TVector<ivec2, int, 2>
+{
+    union
+    {
+        struct
+        {
+            int x, y;
+        };
+        std::array<int, 2> data;
+    };
+
+    ivec2() noexcept : x(0), y(0)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    ivec2(const unsigned& v) noexcept : x(v), y(v)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    ivec2(const unsigned& _x, const unsigned& _y) noexcept : x(_x), y(_y)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    ivec2(const ivec2& other) noexcept : x(other.x), y(other.y)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    ivec2(ivec2&& other) noexcept : x(other.x), y(other.y)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    ivec2& operator=(const ivec2& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        return *this;
+    }
+
+    ivec2& operator=(ivec2&& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        return *this;
+    }
+};
+
+struct uvec2 : public TVector<uvec2, unsigned, 2>
+{
+    union
+    {
+        struct
+        {
+            unsigned x, y;
+        };
+        std::array<unsigned, 2> data;
+    };
+
+    uvec2() noexcept : x(0), y(0)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    uvec2(const unsigned& v) noexcept : x(v), y(v)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    uvec2(const unsigned& _x, const unsigned& _y) noexcept : x(_x), y(_y)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    uvec2(const uvec2& other) noexcept : x(other.x), y(other.y)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    uvec2(uvec2&& other) noexcept : x(other.x), y(other.y)
+    {
+        data[0] = x;
+        data[1] = y;
+    }
+
+    uvec2& operator=(const uvec2& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        return *this;
+    }
+
+    uvec2& operator=(uvec2&& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        return *this;
+    }
+};
+
 } // namespace ramanujan::experimental
 
 #endif
