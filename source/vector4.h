@@ -1,6 +1,7 @@
 #pragma once
 
 #include "precision.h"
+#include "vector.hpp"
 
 namespace ramanujan
 {
@@ -23,6 +24,8 @@ struct TVector4
     inline TVector4(T v) : x(v), y(v), z(v), w(v) {}
     inline TVector4(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) {}
     inline TVector4(T* fv) : x(fv[0]), y(fv[1]), z(fv[2]), w(fv[3]) {}
+
+    operator ramanujan::experimental::vec4() const { return ramanujan::experimental::vec4{x, y, z, w}; }
 };
 
 typedef TVector4<real>         Vector4;

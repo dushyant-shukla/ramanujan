@@ -2,6 +2,7 @@
 
 #include "constants.h"
 #include "precision.h"
+#include "vector.hpp"
 
 namespace ramanujan
 {
@@ -50,6 +51,8 @@ struct Vector3
      * @return The result of component-wise product between vector 'a' and vector 'b'
      */
     friend Vector3 componentProduct(const Vector3& a, const Vector3& b);
+
+    operator ramanujan::experimental::vec3() const { return ramanujan::experimental::vec3{x, y, z}; }
 };
 
 real    Dot(const Vector3& a, const Vector3& b);
