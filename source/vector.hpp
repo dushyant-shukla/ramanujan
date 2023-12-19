@@ -111,7 +111,7 @@ public:
         auto& self = type();
         for(size_type i = 0; i < N; ++i)
         {
-            self.data[i] *= scalar;
+            self.data[i] /= scalar;
         }
         return self;
     }
