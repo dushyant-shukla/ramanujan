@@ -514,10 +514,10 @@ public:
     }
 
     template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 4 && C == 4, vec3> transformPoint(const vec3& vector, real& w) const noexcept
+    typename std::enable_if_t<R == 4 && C == 4, vec4> transformPoint(const vec3& vector, real& w) const noexcept
     {
         const auto& self = type();
-        vec3        result(vector);
+        vec4        result(vector);
         result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8] + w * self.m[12];
         result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9] + w * self.m[13];
         result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10] + w * self.m[14];
