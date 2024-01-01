@@ -746,6 +746,14 @@ struct vec4 : public TVector<vec4, real, 4>
         return *this;
     }
 
+    vec4(const vec3& other, real w = real(1.0)) noexcept : x(other.x), y(other.y), z(other.z), w(w)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+        data[3] = w;
+    }
+
     [[nodiscard]] vec2 xy() const noexcept { return {x, y}; }
 
     [[nodiscard]] vec2 yz() const noexcept { return {y, z}; }
