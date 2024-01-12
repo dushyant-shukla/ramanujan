@@ -349,7 +349,7 @@ public:
      * @return A reference to the inverted matrix.
      */
     template <size_type R = ROWS, size_type C = COLUMNS>
-    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> inverted() noexcept
+    typename std::enable_if_t<R == 4 && C == 4, MAT_TYPE> inverted() const noexcept
     {
         /*
          * Consider the below layout of the matrix for calculating the cofactor matrix.
@@ -522,6 +522,30 @@ public:
         result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9] + w * self.m[13];
         result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10] + w * self.m[14];
         w        = vector.x * self.m[3] + vector.y * self.m[7] + vector.z * self.m[11] + w * self.m[15];
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, vec4> transformPoint(const vec3& vector, const real& w) const noexcept
+    {
+        const auto& self = type();
+        vec4        result(vector);
+        result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8] + w * self.m[12];
+        result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9] + w * self.m[13];
+        result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10] + w * self.m[14];
+        //w        = vector.x * self.m[3] + vector.y * self.m[7] + vector.z * self.m[11] + w * self.m[15];
+        return result;
+    }
+
+    template <size_type R = ROWS, size_type C = COLUMNS>
+    typename std::enable_if_t<R == 4 && C == 4, vec4> transformPoint(const vec4& vector) noexcept
+    {
+        const auto& self = type();
+        vec4        result(vector);
+        result.x = vector.x * self.m[0] + vector.y * self.m[4] + vector.z * self.m[8] + vector.w * self.m[12];
+        result.y = vector.x * self.m[1] + vector.y * self.m[5] + vector.z * self.m[9] + vector.w * self.m[13];
+        result.z = vector.x * self.m[2] + vector.y * self.m[6] + vector.z * self.m[10] + vector.w * self.m[14];
+        result.w = vector.x * self.m[3] + vector.y * self.m[7] + vector.z * self.m[11] + vector.w * self.m[15];
         return result;
     }
 

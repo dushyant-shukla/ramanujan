@@ -195,7 +195,7 @@ public:
 
     [[nodiscard]] VEC_TYPE operator/(const T& scalar) const noexcept
     {
-        assert(scalar > T(0));
+        assert(real_abs(scalar) > T(0));
         auto&    self = type();
         VEC_TYPE result{};
         for(size_type i = 0; i < N; ++i)
@@ -883,6 +883,78 @@ struct uvec2 : public TVector<uvec2, unsigned, 2>
         y = rhs.y;
         return *this;
     }
+};
+
+struct uvec3 : public TVector<uvec3, unsigned, 3>
+{
+    union
+    {
+        struct
+        {
+            unsigned x, y, z;
+        };
+        std::array<unsigned, 3> data;
+    };
+
+    uvec3() noexcept : x(0), y(0), z(0)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    uvec3(const unsigned& v) noexcept : x(v), y(v), z(v)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    uvec3(const unsigned& _x, const unsigned& _y, const unsigned& _z) noexcept : x(_x), y(_y), z(_z)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    uvec3(const uvec3& other) noexcept : x(other.x), y(other.y), z(other.z)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    uvec3(uvec3&& other) noexcept : x(other.x), y(other.y), z(other.z)
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    uvec3& operator=(const uvec3& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        z = rhs.z;
+        return *this;
+    }
+
+    uvec3& operator=(uvec3&& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        z = rhs.z;
+        return *this;
+    }
+
+    // vec3& operator=(const vec3& rhs) noexcept = default;
+    // vec3& operator=(vec3&& rhs) noexcept = default;
+
+    [[nodiscard]] uvec2 xy() const noexcept { return {x, y}; }
+
+    [[nodiscard]] uvec2 yz() const noexcept { return {y, z}; }
+
+    [[nodiscard]] uvec2 xz() const noexcept { return {x, z}; }
 };
 
 } // namespace ramanujan::experimental
